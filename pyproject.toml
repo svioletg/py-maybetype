@@ -1,0 +1,16 @@
+[project]
+name = "maybetype"
+version = "0.1.0"
+description = "A basic implementation of a maybe/option type in Python, largely inspired by Rust's Option."
+authors = [
+    { name="Seth 'Violet' Gibbs" }
+]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=9.0.2",
+    "ruff>=0.14.8",
+]
