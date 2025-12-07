@@ -18,7 +18,7 @@ pip install git+https://github.com/svioletg/py-maybetype
 Call the `Maybe` constructor with a `T | None` value to create a `Maybe[T]`.
 
 ```python
-from maybetype.maybe import Maybe
+from maybetype import Maybe
 
 def try_int(x: str) -> int | None:
     """Attempts to convert a string of digits into an `int`, returning `None` if not possible."""
