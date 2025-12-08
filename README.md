@@ -42,3 +42,26 @@ from maybetype import Maybe
 num1: Maybe[int] = Maybe.int('5')
 num2: Maybe[int] = Maybe.int('five')
 ```
+
+---
+
+Convert a `str | None` timestamp into a `datetime` object if not `None`, or otherwise just return `None`:
+
+```python
+from datetime import datetime
+from maybetype import Maybe
+
+date_str = '2025-09-06T030000'
+date = Maybe('2025-09-06T030000').then(datetime.fromisoformat)
+# date == datetime.datetime(2025, 9, 6, 3, 0)
+
+date_str = None
+date = Maybe(date_str).then(datetime.fromisoformat)
+# date == None
+
+date_str = ''
+date = Maybe(date_str or None).then(datetime.fromisoformat)
+# date == None
+# Maybe does not treat falsy values as None, only strictly x-is-None values
+# Without `or None` here, datetime.fromisoformat would have raised a ValueError
+```

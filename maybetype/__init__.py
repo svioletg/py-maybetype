@@ -76,6 +76,7 @@ class Maybe[T]:
 
     def this_or(self, other: T) -> 'Maybe[T]':
         """Returns the original wrapped value if not `None`, otherwise returns a `Maybe`-wrapped `other`."""
+        # TODO: Should this be wrapped?
         return self if self.val is not None else Maybe(other)
 
     def attr[V](self, name: str, typ: type[V] | None = None, *, err: bool = False) -> 'Maybe[V]':
