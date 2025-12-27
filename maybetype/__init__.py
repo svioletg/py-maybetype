@@ -7,11 +7,14 @@ class Maybe[T]:
     Wraps a value that may be `T` or `None`, providing methods for conditionally using that value or short-circuiting
     to `None` without longer checks.
     """
-    def __init__(self, val: T | None) -> None:
+    def __init__(self, val: T | None, is_none_if: Callable[[T], bool] = lambda v: v is None) -> None:
         """
         :param val: A value to wrap.
+        :param is_none_if: An optional function that takes `val` and, if it returns `True`, discards `val` and makes
+            this a `Maybe(None)` instance. This function does not need to additionally check if `val` is `None`, as
+            this check will be made on init before attempting to the call the function.
         """
-        self.val = val
+        self.val = None if (val is None) or is_none_if(val) else val
 
     def __repr__(self) -> str:
         return f'Maybe({self.val!r})'
@@ -42,17 +45,17 @@ class Maybe[T]:
     @staticmethod
     def cat(vals: 'Iterable[Maybe[T]]') -> list[T]:
         """
-        Takes an iterable of `Maybe` values and returns a list of only the non-`None` values.
+        Takes an iterable of `Maybe` and returns a list of the unwrapped values of non-`Maybe(None)` objects.
 
         >>> vals = [Maybe(5), Maybe(None), Maybe(10), Maybe(None)]
         >>> assert vals.cat() == [5, 10]
         """
-        return [i.unwrap() for i in vals if i.val is not None]
+        return [i.unwrap() for i in vals if i]
 
     @staticmethod
-    def map[I, O](fn: 'Callable[[I], Maybe[O]]', vals: Iterable[I]) -> list[O]:
+    def map[A, B](fn: 'Callable[[A], Maybe[B]]', vals: Iterable[A]) -> list[B]:
         """Maps `fn` onto `vals`, taking the unwrapped values and discarding `Maybe(None)`s."""
-        return [i.unwrap() for i in map(fn, vals) if i.val is not None]
+        return [i.unwrap() for i in map(fn, vals) if i]
 
     def unwrap(self,
             exc: Exception | Callable[..., NoReturn] | None = None,
@@ -76,8 +79,8 @@ class Maybe[T]:
 
     def this_or(self, other: T) -> 'Maybe[T]':
         """Returns the original wrapped value if not `None`, otherwise returns a `Maybe`-wrapped `other`."""
-        # TODO: Should this be wrapped?
-        return self if self.val is not None else Maybe(other)
+        # TODO: Does this need to be wrapped?
+        return self if self else Maybe(other)
 
     def attr[V](self, name: str, typ: type[V] | None = None, *, err: bool = False) -> 'Maybe[V]':
         """
