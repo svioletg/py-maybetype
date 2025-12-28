@@ -110,3 +110,15 @@ def test_maybe_cat() -> None:
 
 def test_maybe_map() -> None:
     assert Maybe.map(Maybe.int, ALPHANUMERIC) == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+@pytest.mark.parametrize(('value', 'is_none_if'),
+    [
+        (0, lambda a: a > 0),
+        ([], lambda a: len(a) > 0),
+        ([], lambda a: 'x' in a),
+        ({}, lambda a: len(a) > 0),
+        ({}, lambda a: 'x' in a),
+    ],
+)
+def test_maybe_is_none_if_condition[T](value: T, is_none_if: Callable[[T], bool]) -> None:
+    assert Maybe(value, is_none_if) == Maybe(None)
