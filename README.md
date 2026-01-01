@@ -32,20 +32,43 @@ num2: Maybe[int] = Maybe(try_int('five'))
 
 print(num1.unwrap()) # 5
 print(num2.unwrap()) # (raises ValueError)
+
+# Maybe instances are falsy if Maybe(None), truthy otherwise
+
+assert bool(num1) is True
+assert bool(num2) is False
 ```
 
 This example in particular can also be done with `Maybe`'s built-in `int()` class method:
 
 ```python
-from maybetype import Maybe
-
 num1: Maybe[int] = Maybe.int('5')
 num2: Maybe[int] = Maybe.int('five')
 ```
 
----
+The `Maybe` constructor can be given an additional optional argument to specify a condition
+in which `Maybe(None)` is returned regardless of if the value in question is truly `None`. This
+argument must be a `Callable` that returns `bool`, where returning `False` causes the constructor
+to return `Maybe(None)`.
 
-Convert a `str | None` timestamp into a `datetime` object if not `None`, or otherwise just return `None`:
+```python
+import re
+import uuid
+
+from maybetype import Maybe
+
+def is_valid_uuid(s: str) -> bool:
+    return re.match(r"[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}|[0-9a-f]{32}", s) is not None
+
+assert Maybe('3b1bcc3a-41d5-49a5-8273-10cc605e31f9', is_valid_uuid)
+assert Maybe('3b1bcc3a41d549a5827310cc605e31f9', is_valid_uuid)
+assert not Maybe('qwertyuiopasdfghjklzxcvbnm', is_valid_uuid)
+assert not Maybe('nf0cmmdq-l0gt-rq5a-upry-706trht3ocv9', is_valid_uuid)
+```
+
+## Other examples
+
+Converting a `str | None` timestamp into a `datetime` object if not `None`, otherwise returning `None`:
 
 ```python
 from datetime import datetime

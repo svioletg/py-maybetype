@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] - 2025-12-31
+
+### Fixed
+
+- Corrected the docstring of `Maybe.__init__()`'s description of the `just_condition` parameter,
+  which incorrectly stated `just_condition` must return `True` for the constructor to return
+  `Maybe(None)`—the opposite is true, `Maybe(None)` is returned if `just_condition` returns `False`
+
 ## [0.3.0] - 2025-12-27
 
 ### Added

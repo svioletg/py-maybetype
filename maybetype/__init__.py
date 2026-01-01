@@ -10,7 +10,7 @@ class Maybe[T]:
     def __init__(self, val: T | None, just_condition: Callable[[T], bool] = lambda v: v is not None) -> None:
         """
         :param val: A value to wrap.
-        :param just_condition: An optional function that takes `val` and, if it returns `True`, discards `val` and
+        :param just_condition: An optional function that takes `val` and, if it returns `False`, discards `val` and
             makes this a `Maybe(None)` instance. This function does not need to additionally check if `val` is `None`,
             as this check will be made on init before attempting to the call the function.
         """
