@@ -8,3 +8,6 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Sphinx-generated files
+_build/
