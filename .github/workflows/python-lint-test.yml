@@ -27,6 +27,7 @@ jobs:
     - name: Lint with ruff
       run: |
         ruff check .
-    - name: pytest
+    - name: Test
       run: |
-        pytest -v --doctest-modules
+        python -m doctest maybetype/*.py
+        pytest -v
