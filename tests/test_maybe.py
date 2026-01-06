@@ -111,14 +111,21 @@ def test_maybe_cat() -> None:
 def test_maybe_map() -> None:
     assert Maybe.map(Maybe.int, ALPHANUMERIC) == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
-@pytest.mark.parametrize(('value', 'is_none_if'),
+def is_valid_uuid(s: str) -> bool:
+    return re.match(r"[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}|[0-9a-f]{32}", s) is not None
+
+@pytest.mark.parametrize(('value', 'just_condition', 'expected_bool'),
     [
-        (0, lambda a: a > 0),
-        ([], lambda a: len(a) > 0),
-        ([], lambda a: 'x' in a),
-        ({}, lambda a: len(a) > 0),
-        ({}, lambda a: 'x' in a),
+        (0, lambda a: a > 0, False),
+        ([], lambda a: len(a) > 0, False),
+        ([], lambda a: 'x' in a, False),
+        ({}, lambda a: len(a) > 0, False),
+        ({}, lambda a: 'x' in a, False),
+        ('3b1bcc3a-41d5-49a5-8273-10cc605e31f9', is_valid_uuid, True),
+        ('3b1bcc3a41d549a5827310cc605e31f9', is_valid_uuid, True),
+        ('qwertyuiopasdfghjklzxcvbnm', is_valid_uuid, False),
+        ('nf0cmmdq-l0gt-rq5a-upry-706trht3ocv9', is_valid_uuid, False),
     ],
 )
-def test_maybe_is_none_if_condition[T](value: T, is_none_if: Callable[[T], bool]) -> None:
-    assert Maybe(value, is_none_if) == Maybe(None)
+def test_maybe_just_condition[T](value: T, just_condition: Callable[[T], bool], expected_bool: bool) -> None:  # noqa: FBT001
+    assert bool(Maybe(value, just_condition)) is expected_bool
