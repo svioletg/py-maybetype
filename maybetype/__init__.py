@@ -22,9 +22,6 @@ class Maybe[T]:
     def __bool__(self) -> bool:
         return self.val is not None
 
-    def __hash__(self) -> int:
-        return self.val.__hash__()
-
     def __eq__(self, other: object) -> bool:
         """
         Returns ``False`` if the compared object is not a ``Maybe`` instance, otherwise compares their wrapped values.
@@ -32,6 +29,19 @@ class Maybe[T]:
         if not isinstance(other, Maybe):
             return False
         return self.val == other.val
+
+    def __hash__(self) -> int:
+        return self.val.__hash__()
+
+    @staticmethod
+    def cat(vals: 'Iterable[Maybe[T]]') -> list[T]:
+        """
+        Takes an iterable of ``Maybe`` and returns a list of the unwrapped values of non-``Maybe(None)`` objects.
+
+        >>> vals = [Maybe(5), Maybe(None), Maybe(10), Maybe(None)]
+        >>> assert Maybe.cat(vals) == [5, 10]
+        """
+        return [i.unwrap() for i in vals if i]
 
     @staticmethod
     def int(val: Any) -> 'Maybe[int]':  # noqa: ANN401
@@ -46,44 +56,9 @@ class Maybe[T]:
             return Maybe(None)
 
     @staticmethod
-    def cat(vals: 'Iterable[Maybe[T]]') -> list[T]:
-        """
-        Takes an iterable of ``Maybe`` and returns a list of the unwrapped values of non-``Maybe(None)`` objects.
-
-        >>> vals = [Maybe(5), Maybe(None), Maybe(10), Maybe(None)]
-        >>> assert Maybe.cat(vals) == [5, 10]
-        """
-        return [i.unwrap() for i in vals if i]
-
-    @staticmethod
     def map[A, B](fn: 'Callable[[A], Maybe[B]]', vals: Iterable[A]) -> list[B]:
         """Maps ``fn`` onto ``vals``, taking the unwrapped values and discarding ``Maybe(None)``s."""
         return [i.unwrap() for i in map(fn, vals) if i]
-
-    def unwrap(self,
-            exc: Exception | Callable[..., NoReturn] | None = None,
-            *exc_args: object,
-        ) -> T:
-        """
-        Return the wrapped value if it is not ``None``, otherwise raise ``ValueError``.
-
-        :param exc: The exception to raise if the wrapped value is ``None``. Can be either an ``Exception`` object, or a
-            ``Callable`` which takes any arguments and does not return. If given ``None``, the default behavior is to
-            raise a ``ValueError`` with the message ``Maybe[<type>] unwrapped into None``.
-        :param exc_args: Arguments to call ``exc`` with, if ``exc`` is a ``Callable``. Otherwise, this argument is not
-            used.
-        """
-        if self.val is None:
-            if exc is None:
-                raise ValueError(f'Maybe[{T.__name__}] unwrapped into None')
-            if isinstance(exc, Callable):
-                exc(*exc_args)
-            raise exc
-        return self.val
-
-    def this_or(self, other: T) -> 'Maybe[T]':
-        """Returns the original wrapped value if not ``None``, otherwise returns a ``Maybe``-wrapped ``other``."""
-        return self if self else Maybe(other)
 
     def attr[V](self, name: str, typ: type[V] | None = None, *, err: bool = False) -> 'Maybe[V]':
         """
@@ -143,3 +118,28 @@ class Maybe[T]:
             (``R``).
         """
         return func(self.val) if self.val is not None else None
+
+    def this_or(self, other: T) -> 'Maybe[T]':
+        """Returns the original wrapped value if not ``None``, otherwise returns a ``Maybe``-wrapped ``other``."""
+        return self if self else Maybe(other)
+
+    def unwrap(self,
+            exc: Exception | Callable[..., NoReturn] | None = None,
+            *exc_args: object,
+        ) -> T:
+        """
+        Return the wrapped value if it is not ``None``, otherwise raise ``ValueError``.
+
+        :param exc: The exception to raise if the wrapped value is ``None``. Can be either an ``Exception`` object, or a
+            ``Callable`` which takes any arguments and does not return. If given ``None``, the default behavior is to
+            raise a ``ValueError`` with the message ``Maybe[<type>] unwrapped into None``.
+        :param exc_args: Arguments to call ``exc`` with, if ``exc`` is a ``Callable``. Otherwise, this argument is not
+            used.
+        """
+        if self.val is None:
+            if exc is None:
+                raise ValueError(f'Maybe[{T.__name__}] unwrapped into None')
+            if isinstance(exc, Callable):
+                exc(*exc_args)
+            raise exc
+        return self.val
