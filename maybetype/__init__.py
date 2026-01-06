@@ -7,14 +7,14 @@ class Maybe[T]:
     Wraps a value that may be ``T`` or ``None``, providing methods for conditionally using that value or
     short-circuiting to ``None`` without longer checks.
     """
-    def __init__(self, val: T | None, just_condition: Callable[[T], bool] = lambda v: v is not None) -> None:
+    def __init__(self, val: T | None, predicate: Callable[[T], bool] = lambda v: v is not None) -> None:
         """
         :param val: A value to wrap.
-        :param just_condition: An optional function that takes ``val`` and, if it returns ``False``, discards ``val``
+        :param predicate: An optional function that takes ``val`` and, if it returns ``False``, discards ``val``
             and makes this a ``Maybe(None)`` instance. This function does not need to additionally check if ``val`` is
             ``None``, as this check will be made on init before attempting to the call the function.
         """
-        self.val = None if (val is None) or not just_condition(val) else val
+        self.val = None if (val is None) or not predicate(val) else val
 
     def __repr__(self) -> str:
         return f'Maybe({self.val!r})'
@@ -26,6 +26,9 @@ class Maybe[T]:
         return self.val.__hash__()
 
     def __eq__(self, other: object) -> bool:
+        """
+        Returns ``False`` if the compared object is not a ``Maybe`` instance, otherwise compares their wrapped values.
+        """
         if not isinstance(other, Maybe):
             return False
         return self.val == other.val
