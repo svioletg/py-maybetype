@@ -1,5 +1,7 @@
 # py-maybetype
 
+Documentation: <https://py-maybetype.readthedocs.io/en/latest/>
+
 A basic implementation of a maybe/option type in Python, largely inspired by Rust's `Option`.
 This was created as part of a separate project I had been working on, but I decided to make it into
 its own package as I wanted to use it elsewhere and its scope grew. This is not meant to be a 1:1

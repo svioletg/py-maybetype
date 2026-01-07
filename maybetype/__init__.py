@@ -128,7 +128,7 @@ class Maybe[T]:
             *exc_args: object,
         ) -> T:
         """
-        Return the wrapped value if it is not ``None``, otherwise raise ``ValueError``.
+        Returns the wrapped value if it is not ``None``, otherwise raises ``ValueError``.
 
         :param exc: The exception to raise if the wrapped value is ``None``. Can be either an ``Exception`` object, or a
             ``Callable`` which takes any arguments and does not return. If given ``None``, the default behavior is to
@@ -143,3 +143,7 @@ class Maybe[T]:
                 exc(*exc_args)
             raise exc
         return self.val
+
+    def unwrap_or(self, other: T) -> T:
+        """Returns the wrapped value if it is not ``None``, otherwise returns ``other``."""
+        return self.val if self.val is not None else other

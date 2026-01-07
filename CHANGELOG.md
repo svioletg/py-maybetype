@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added method `Maybe.unwrap_or()`
+
 ### Changed
 
 - `Maybe.__init__()` parameter `just_condition` renamed to `predicate`
