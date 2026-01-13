@@ -14,6 +14,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - `Maybe.__init__()` parameter `just_condition` renamed to `predicate`
+- Replaced uses of `NoReturn` with `Never`
+- `Maybe.get()` now directly checks for the `__getitem__` method on the wrapped value instead of
+  checking `Sequence | Mapping`
+
+### Fixed
+
+- `Maybe.attr_or()` no longer has a default argument of `None` for its `default` parameter, as the
+  docstring describes
 
 ## [0.4.0]
 

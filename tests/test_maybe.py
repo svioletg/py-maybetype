@@ -4,6 +4,7 @@ from copy import deepcopy
 from dataclasses import dataclass
 from string import ascii_lowercase
 from types import EllipsisType
+from typing import Any
 
 import pytest
 
@@ -13,7 +14,7 @@ ALPHANUMERIC: str = ascii_lowercase + '0123456789'
 MAYBE_UNWRAP_NONE_REGEX: re.Pattern[str] = re.compile(r"Maybe\[.*\] unwrapped into None")
 
 def test_maybe_none_unwrap_error() -> None:
-    m_none: Maybe[None] = Maybe(None)
+    m_none: Maybe[Any] = Maybe(None)
     assert bool(m_none) is False
     with pytest.raises(ValueError, match=MAYBE_UNWRAP_NONE_REGEX):
         m_none.unwrap()
@@ -25,6 +26,18 @@ def test_maybe_this_or() -> None:
     assert Maybe.int('ten').this_or(0).unwrap() == 0
     with pytest.raises(ValueError, match=MAYBE_UNWRAP_NONE_REGEX):
         Maybe.int('ten').unwrap()
+
+@pytest.mark.parametrize(('val', 'default'),
+    [
+        (5, 10),
+        (5, None),
+        ('string', 'fallback'),
+        ('string', None),
+    ],
+)
+def test_maybe_unwrap_or(val: object, default: object) -> None:
+    assert Maybe(val).unwrap_or(default) == val
+    assert Maybe(None).unwrap_or(default) == default
 
 @pytest.mark.parametrize(('val', 'then_fn'),
     [
@@ -114,7 +127,7 @@ def test_maybe_map() -> None:
 def is_valid_uuid(s: str) -> bool:
     return re.match(r"[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}|[0-9a-f]{32}", s) is not None
 
-@pytest.mark.parametrize(('value', 'just_condition', 'expected_bool'),
+@pytest.mark.parametrize(('value', 'predicate', 'expected_bool'),
     [
         (0, lambda a: a > 0, False),
         ([], lambda a: len(a) > 0, False),
@@ -127,5 +140,5 @@ def is_valid_uuid(s: str) -> bool:
         ('nf0cmmdq-l0gt-rq5a-upry-706trht3ocv9', is_valid_uuid, False),
     ],
 )
-def test_maybe_just_condition[T](value: T, just_condition: Callable[[T], bool], expected_bool: bool) -> None:  # noqa: FBT001
-    assert bool(Maybe(value, just_condition)) is expected_bool
+def test_maybe_with_predicate[T](value: T, predicate: Callable[[T], bool], expected_bool: bool) -> None:  # noqa: FBT001
+    assert bool(Maybe(value, predicate)) is expected_bool

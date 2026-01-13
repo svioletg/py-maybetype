@@ -1,5 +1,5 @@
-from collections.abc import Callable, Iterable, Mapping, Sequence
-from typing import Any, NoReturn
+from collections.abc import Callable, Iterable
+from typing import Any, Never
 
 
 class Maybe[T]:
@@ -72,9 +72,10 @@ class Maybe[T]:
         """
         return Maybe(getattr(self.val, name)) if err else Maybe(getattr(self.val, name, None))
 
-    def attr_or[V](self, name: str, default: V = None) -> V:
+    def attr_or[V](self, name: str, default: V) -> V:
         """
-        Similar to the ``attr`` method, but is guaranteed to return a non-``None`` value and requires a default.
+        Similar to the ``attr`` method, but unwraps the result if the attribute exists or returns the required default
+        value otherwise.
         """
         try:
             return self.attr(name, err=True).unwrap()
@@ -101,9 +102,9 @@ class Maybe[T]:
             first placed (such as with ``Maybe(None)``), no error is raised, and ``Maybe(None)`` is returned regardless.
         :param default: Specifies an alternate value to return a ``Maybe`` of instead of ``None``.
         """
-        if isinstance(self.val, Sequence | Mapping):
+        if hasattr(self.val, '__getitem__'):
             try:
-                return Maybe(self.val.__getitem__(accessor))
+                return Maybe(self.val.__getitem__(accessor)) # type: ignore
             except (IndexError, KeyError):
                 if err:
                     raise
@@ -124,7 +125,7 @@ class Maybe[T]:
         return self if self else Maybe(other)
 
     def unwrap(self,
-            exc: Exception | Callable[..., NoReturn] | None = None,
+            exc: Exception | Callable[..., Never] | None = None,
             *exc_args: object,
         ) -> T:
         """
@@ -137,11 +138,11 @@ class Maybe[T]:
             used.
         """
         if self.val is None:
-            if exc is None:
-                raise ValueError(f'Maybe[{T.__name__}] unwrapped into None')
+            if isinstance(exc, Exception):
+                raise exc
             if isinstance(exc, Callable):
                 exc(*exc_args)
-            raise exc
+            raise ValueError(f'Maybe[{T.__name__}] unwrapped into None')
         return self.val
 
     def unwrap_or(self, other: T) -> T:
