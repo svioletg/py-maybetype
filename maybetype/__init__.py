@@ -132,7 +132,7 @@ class Maybe[T]:
             *exc_args: object,
         ) -> T:
         """
-        Returns the wrapped value if it is not ``None``, otherwise raises ``ValueError``.
+        Returns the wrapped value if it is not ``None``, otherwise raises ``ValueError`` by default.
 
         :param exc: The exception to raise if the wrapped value is ``None``. Can be either an ``Exception`` object, or a
             ``Callable`` which takes any arguments and does not return. If given ``None``, the default behavior is to
