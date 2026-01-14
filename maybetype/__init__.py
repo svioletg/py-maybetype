@@ -7,7 +7,10 @@ class Maybe[T]:
     Wraps a value that may be ``T`` or ``None``, providing methods for conditionally using that value or
     short-circuiting to ``None`` without longer checks.
     """
-    def __init__(self, val: T | None, predicate: Callable[[T], bool] = lambda v: v is not None) -> None:
+    def __init__(self,
+            val: T | None,
+            predicate: Callable[[T], bool] = lambda v: v is not None,
+        ) -> None:
         """
         :param val: A value to wrap.
         :param predicate: An optional function that takes ``val`` and, if it returns ``False``, discards ``val``

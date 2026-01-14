@@ -121,6 +121,10 @@ def test_maybe_get(val: object, accessor: object, result: object) -> None:
 def test_maybe_cat() -> None:
     assert Maybe.cat(map(Maybe.int, ALPHANUMERIC)) == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
+def test_maybe_cat_failure() -> None:
+    with pytest.raises(AttributeError, match='has no attribute \'unwrap\''):
+        Maybe.cat([1, 2, 3]) # type: ignore
+
 def test_maybe_map() -> None:
     assert Maybe.map(Maybe.int, ALPHANUMERIC) == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
