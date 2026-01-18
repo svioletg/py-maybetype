@@ -8,18 +8,21 @@ from typing import Any
 
 import pytest
 
-from maybetype import Maybe
+from maybetype import Maybe, Nothing, Some, maybe
 
 ALPHANUMERIC: str = ascii_lowercase + '0123456789'
 MAYBE_UNWRAP_NONE_REGEX: re.Pattern[str] = re.compile(r"Maybe\[.*\] unwrapped into None")
 
 def test_maybe_none_unwrap_error() -> None:
-    m_none: Maybe[Any] = Maybe(None)
+    m_none: Maybe[Any] = Nothing
     assert bool(m_none) is False
     with pytest.raises(ValueError, match=MAYBE_UNWRAP_NONE_REGEX):
         m_none.unwrap()
     with pytest.raises(TypeError, match='Custom error message'):
         m_none.unwrap(exc=TypeError('Custom error message'))
+
+def test_maybe_none_is_nothing() -> None:
+    assert maybe(None) is Nothing
 
 def test_maybe_this_or() -> None:
     assert Maybe.int('10').this_or(0).unwrap() == 10  # noqa: PLR2004
@@ -36,8 +39,8 @@ def test_maybe_this_or() -> None:
     ],
 )
 def test_maybe_unwrap_or(val: object, default: object) -> None:
-    assert Maybe(val).unwrap_or(default) == val
-    assert Maybe(None).unwrap_or(default) == default
+    assert maybe(val).unwrap_or(default) == val
+    assert maybe(None).unwrap_or(default) == default
 
 @pytest.mark.parametrize(('val', 'then_fn'),
     [
@@ -61,13 +64,13 @@ def test_maybe_unwrap_or(val: object, default: object) -> None:
     ],
 )
 def test_maybe_then[T, R, A](val: T, then_fn: tuple[Callable[[T], R], R, A | EllipsisType]) -> None:
-    m: Maybe[T] = Maybe(val)
+    m: Maybe[T] = maybe(val)
     assert bool(m) is True
     assert m.unwrap() == val
     m_before = deepcopy(m.val)
     assert m.then(then_fn[0]) == then_fn[1]
     assert m.unwrap() == (then_fn[2] if then_fn[2] is not Ellipsis else m_before)
-    assert Maybe(None).then(then_fn[0]) is None
+    assert maybe(None).then(then_fn[0]) is None
 
 def test_maybe_attr() -> None:
     @dataclass
@@ -78,17 +81,17 @@ def test_maybe_attr() -> None:
     class B(A):
         y: float
 
-    m_none: Maybe[A] = Maybe(None)
+    m_none: Maybe[A] = maybe(None)
     assert m_none.attr('x').val is None
     assert m_none.attr_or('x', 2) == 2  # noqa: PLR2004
 
-    m_a: Maybe[A] = Maybe(A(1))
+    m_a: Maybe[A] = maybe(A(1))
     assert m_a.attr('x').unwrap() == 1
     assert m_a.attr_or('x', 2) == 1
     assert m_a.attr('y').val is None
     assert m_a.attr_or('y', 2) == 2  # noqa: PLR2004
 
-    m_b: Maybe[B] = Maybe(B(1, 2.0))
+    m_b: Maybe[B] = maybe(B(1, 2.0))
     assert m_b.attr('x').unwrap() == 1
     assert m_b.attr_or('x', 2) == 1
     assert m_b.attr('y').unwrap() == 2.0  # noqa: PLR2004
@@ -96,13 +99,13 @@ def test_maybe_attr() -> None:
 
 @pytest.mark.parametrize(('val', 'accessor', 'result'),
     [
-        (None,             1,   Maybe(None)),
-        ([1, 2, 3],        1,   Maybe(2)),
-        ([1, 2, 3],        3,   Maybe(None)),
-        ([],               1,   Maybe(None)),
-        ({'a': 1, 'b': 2}, 'a', Maybe(1)),
-        ({'a': 1, 'b': 2}, 'c', Maybe(None)),
-        ({},               'a', Maybe(None)),
+        (None,             1,   maybe(None)),
+        ([1, 2, 3],        1,   maybe(2)),
+        ([1, 2, 3],        3,   maybe(None)),
+        ([],               1,   maybe(None)),
+        ({'a': 1, 'b': 2}, 'a', maybe(1)),
+        ({'a': 1, 'b': 2}, 'c', maybe(None)),
+        ({},               'a', maybe(None)),
     ],
     ids=[
         'none',
@@ -115,7 +118,7 @@ def test_maybe_attr() -> None:
     ],
 )
 def test_maybe_get(val: object, accessor: object, result: object) -> None:
-    m: Maybe = Maybe(val)
+    m: Maybe = maybe(val)
     assert m.get(accessor) == result
 
 def test_maybe_cat() -> None:
@@ -144,5 +147,32 @@ def is_valid_uuid(s: str) -> bool:
         ('nf0cmmdq-l0gt-rq5a-upry-706trht3ocv9', is_valid_uuid, False),
     ],
 )
-def test_maybe_with_predicate[T](value: T, predicate: Callable[[T], bool], expected_bool: bool) -> None:  # noqa: FBT001
-    assert bool(Maybe(value, predicate)) is expected_bool
+def test_maybe_with_predicate[T](value: T, predicate: Callable[[T], bool], expected_bool: bool) -> None:
+    assert bool(maybe(value, predicate)) is expected_bool
+    if expected_bool is False:
+        assert maybe(value, predicate) is Nothing
+
+@pytest.mark.parametrize(('value', 'predicate', 'expected'),
+    [
+        (0, lambda a: a > 0, None),
+        ([], lambda a: len(a) > 0, None),
+        ([], lambda a: 'x' in a, None),
+        ({}, lambda a: len(a) > 0, None),
+        ({}, lambda a: 'x' in a, None),
+        ('3b1bcc3a-41d5-49a5-8273-10cc605e31f9', is_valid_uuid, ...),
+        ('3b1bcc3a41d549a5827310cc605e31f9', is_valid_uuid, ...),
+        ('qwertyuiopasdfghjklzxcvbnm', is_valid_uuid, None),
+        ('nf0cmmdq-l0gt-rq5a-upry-706trht3ocv9', is_valid_uuid, None),
+    ],
+)
+def test_maybe_pattern_matching[T](value: T, predicate: Callable[[T], bool], expected: T | None) -> None:
+    if expected is Ellipsis:
+        expected = value
+
+    match maybe(value, predicate):
+        case Some(value):
+            result = value
+        case _:
+            result = None
+
+    assert result == expected

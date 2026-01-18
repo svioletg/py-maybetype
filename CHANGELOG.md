@@ -9,14 +9,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added `__match_args__` attribute to `Maybe` to allow using its value in `match`/`case` pattern matching
 - Added method `Maybe.unwrap_or()`
+- Added classes `Some` and `_Nothing`
+  - `_Nothing` is intended to be used through the `Nothing` singleton instance, rather than
+    constructing new instances of it, since effectively all `_Nothing` instances should behave the
+    same
+  - Instances of `Some` are **always truthy**, and `Nothing` is **always falsy**
+- Added function `maybe()`
+  - Returns either a `Some` instance or the `Nothing` singleton depending on the given value and
+    predicate, similar to the previous functionality of `Maybe.__init__()`
+  - Usage should now replace direct instancing of `Maybe`
 
 ### Changed
 
-- `Maybe.__init__()` parameter `just_condition` renamed to `predicate`
+- `Maybe.__init__()` body moved to `maybe()` function, now simply assigns the passed `val` to its
+  `val` attribute
+  - A warning is now issued if `Maybe`'s constructor is called directly
 - Replaced uses of `NoReturn` with `Never`
 - `Maybe.get()` now directly checks for the `__getitem__` method on the wrapped value instead of
   checking `Sequence | Mapping`
+- Anywhere `Maybe(None)` would have been returned now returns the `Nothing` singleton
 
 ### Fixed
 
