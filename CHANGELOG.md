@@ -36,7 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Maybe.attr_or()` no longer has a default argument of `None` for its `default` parameter, as the
   docstring describes
 
-## [0.4.0]
+## [0.4.0] - 2026-01-02
 
 ### Added
 
