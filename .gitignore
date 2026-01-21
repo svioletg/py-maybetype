@@ -11,3 +11,6 @@ wheels/
 
 # Sphinx-generated files
 _build/
+
+# Other
+_*/
