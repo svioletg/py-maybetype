@@ -1,6 +1,10 @@
 # py-maybetype
 
+![Linting & testing](https://github.com/svioletg/py-maybetype/actions/workflows/python-lint-test.yml/badge.svg)
+
 Documentation: <https://py-maybetype.readthedocs.io/en/latest/>
+
+PyPI: <https://pypi.org/project/py-maybetype/>
 
 A basic implementation of a maybe/option type in Python, largely inspired by Rust's `Option`.
 This was created as part of a separate project I had been working on, but I decided to make it into
@@ -10,10 +14,10 @@ interperetation of the idea that I feel works for Python.
 
 ## Usage
 
-Install the package with `pip` using the repository link:
+Install with `pip`:
 
 ```bash
-pip install git+https://github.com/svioletg/py-maybetype
+pip install py-maybetype
 ```
 
 Call the `maybe()` function with a `T | None` value to return a `Maybe[T]`—either a `Some` instance
