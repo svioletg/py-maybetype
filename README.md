@@ -59,6 +59,9 @@ The `maybe` constructor can be given an optional predicate argument to specify a
 for which `Some(value)` is returned. This argument must be a `Callable` that returns `bool`,
 where returning `False` causes the constructor to return `Nothing`.
 
+> [!NOTE]
+> `maybe(None)` will always returning `Nothing`, even if `predicate(None)` would return `True`
+
 ```python
 import re
 import uuid
