@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+Generally, more significant breaking changes will be put near the top of each category.
+
 ## [Unreleased]
 
 ### Added
@@ -16,6 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Renamed method `Maybe.int()` to `Maybe.try_int()`
+- `Maybe.__hash__()` now returns `hash()` called with the wrapped value instead of accessing its
+  `__hash__()` method
 - Most type signatures now use the more standard type variable naming of `T`, `U`, `V`...
   - The only exception currently is the static method `Maybe.map()`, which uses `A` and `B` since
     `T` already belongs the `Maybe` class' scope and the method operates on unrelated types

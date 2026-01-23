@@ -44,10 +44,10 @@ def test_nothing_instance_always_wraps_none(val: object) -> None:
     assert _Nothing(val).val is None # type: ignore
 
 def test_maybe_this_or() -> None:
-    assert Maybe.int('10').this_or(0).unwrap() == 10  # noqa: PLR2004
-    assert Maybe.int('ten').this_or(0).unwrap() == 0
+    assert Maybe.try_int('10').this_or(0).unwrap() == 10  # noqa: PLR2004
+    assert Maybe.try_int('ten').this_or(0).unwrap() == 0
     with pytest.raises(ValueError, match=MAYBE_UNWRAP_NONE_REGEX):
-        Maybe.int('ten').unwrap()
+        Maybe.try_int('ten').unwrap()
 
 @pytest.mark.parametrize(('val', 'default'),
     [
@@ -141,14 +141,14 @@ def test_maybe_get(val: object, accessor: object, result: object) -> None:
     assert m.get(accessor) == result
 
 def test_maybe_cat() -> None:
-    assert Maybe.cat(map(Maybe.int, ALPHANUMERIC)) == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    assert Maybe.cat(map(Maybe.try_int, ALPHANUMERIC)) == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 def test_maybe_cat_failure() -> None:
     with pytest.raises(AttributeError, match='has no attribute \'unwrap\''):
         Maybe.cat([1, 2, 3]) # type: ignore
 
 def test_maybe_map() -> None:
-    assert Maybe.map(Maybe.int, ALPHANUMERIC) == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    assert Maybe.map(Maybe.try_int, ALPHANUMERIC) == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 def is_valid_uuid(s: str) -> bool:
     return re.match(r"[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}|[0-9a-f]{32}", s) is not None

@@ -32,7 +32,7 @@ class Maybe[T]:
         return self.val == other.val
 
     def __hash__(self) -> int:
-        return self.val.__hash__()
+        return hash(self.val)
 
     @staticmethod
     def cat(vals: 'Iterable[Maybe[T]]') -> list[T]:
@@ -46,7 +46,12 @@ class Maybe[T]:
         return [i.unwrap() for i in vals if i]
 
     @staticmethod
-    def int(val: Any) -> 'Maybe[int]':  # noqa: ANN401
+    def map[A, B](fn: 'Callable[[A], Maybe[B]]', vals: Iterable[A]) -> list[B]:
+        """Maps ``fn`` onto ``vals``, taking the unwrapped values of ``Some``s and discarding ``Nothing``s."""
+        return [i.unwrap() for i in map(fn, vals) if i]
+
+    @staticmethod
+    def try_int(val: Any) -> 'Maybe[int]':  # noqa: ANN401
         """
         Attempts to convert ``val`` to an ``int``, returning a ``Some``-wrapped ``int`` if successful, or
         ``Nothing`` on failure.
@@ -56,11 +61,6 @@ class Maybe[T]:
             return Some(i)
         except ValueError:
             return Nothing
-
-    @staticmethod
-    def map[A, B](fn: 'Callable[[A], Maybe[B]]', vals: Iterable[A]) -> list[B]:
-        """Maps ``fn`` onto ``vals``, taking the unwrapped values of ``Some``s and discarding ``Nothing``s."""
-        return [i.unwrap() for i in map(fn, vals) if i]
 
     def and_then[R](self, func: Callable[[T], R]) -> 'Maybe[R]':
         """

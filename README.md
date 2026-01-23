@@ -12,6 +12,10 @@ its own package as I wanted to use it elsewhere and its scope grew. This is not 
 replication or replacement for Rust's `Option` or Haskell's `Maybe`, but rather just an
 interperetation of the idea that I feel works for Python.
 
+> [!WARNING]
+> Breaking changes are likely each update in the 0.x phase. Please check the changelog for these
+> changes before updating to a new version.
+
 ## Usage
 
 Install with `pip`:
@@ -48,11 +52,11 @@ assert bool(num1) is True
 assert bool(num2) is False
 ```
 
-This example in particular can also be done with `Maybe`'s built-in `int()` class method:
+This example in particular can also be done with the `Maybe.try_int()` class method:
 
 ```python
-num1: Maybe[int] = Maybe.int('5')
-num2: Maybe[int] = Maybe.int('five')
+num1: Maybe[int] = Maybe.try_int('5')
+num2: Maybe[int] = Maybe.try_int('five')
 ```
 
 The `maybe` constructor can be given an optional predicate argument to specify a custom condition
@@ -99,9 +103,9 @@ Converting a `str | None` timestamp into a `datetime` object if not `None`, othe
 from datetime import datetime
 from maybetype import maybe
 
-assert maybe('2025-09-06T030000').then(datetime.fromisoformat) == datetime.datetime(2025, 9, 6, 3, 0)
+assert maybe('2025-09-06T030000').then(datetime.fromisoformat) == datetime(2025, 9, 6, 3, 0)
 
-assert maybe(date_str).then(datetime.fromisoformat) is None
+assert maybe(None).then(datetime.fromisoformat) is None
 
 assert maybe('' or None).then(datetime.fromisoformat) is None
 # Maybe does not treat falsy values as None, only strictly x-is-None values
