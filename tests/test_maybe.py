@@ -166,10 +166,13 @@ def is_valid_uuid(s: str) -> bool:
         ('nf0cmmdq-l0gt-rq5a-upry-706trht3ocv9', is_valid_uuid, False),
     ],
 )
-def test_maybe_with_predicate[T](value: T, predicate: Callable[[T], bool], expected_bool: bool) -> None:
+def test_maybe_with_predicate_and_test[T](value: T, predicate: Callable[[T], bool], expected_bool: bool) -> None:
     assert bool(maybe(value, predicate)) is expected_bool
     if expected_bool is False:
         assert maybe(value, predicate) is Nothing
+        assert maybe(value).test(predicate) is Nothing
+    else:
+        assert maybe(value).test(predicate)
 
 @pytest.mark.parametrize(('value', 'predicate', 'expected'),
     [
