@@ -69,7 +69,7 @@ class Maybe[T]:
         """
         return Some(func(self.val)) if self.val is not None else Nothing
 
-    def attr[V](self, name: str, typ: type[V] | None = None, *, err: bool = False) -> 'Maybe[V]':
+    def attr[U](self, name: str, typ: type[U] | None = None, *, err: bool = False) -> 'Maybe[U]':
         """
         Attempts to access an attribute ``name`` on the wrapped object, returning a ``Some`` instance wrapping the
         the value if it exists, or ``Nothing`` otherwise.
@@ -81,7 +81,7 @@ class Maybe[T]:
         """
         return Some(getattr(self.val, name)) if err else maybe(getattr(self.val, name, None))
 
-    def attr_or[V](self, name: str, default: V) -> V:
+    def attr_or[U](self, name: str, default: U) -> U:
         """
         Similar to the ``attr`` method, but unwraps the result if the attribute exists or returns the required default
         value otherwise.
@@ -91,13 +91,13 @@ class Maybe[T]:
         except AttributeError:
             return default
 
-    def get[V](self,
+    def get[U](self,
             accessor: Any,  # noqa: ANN401
-            _typ: type[V] | None = None,
+            _typ: type[U] | None = None,
             *,
             err: bool = False,
-            default: V | None = None,
-        ) -> 'Maybe[V]':
+            default: U | None = None,
+        ) -> 'Maybe[U]':
         """
         Attempts to access an item by ``accessor`` on the wrapped object, assuming the wrapped value implements
         ``__getitem__``. If it does not, or if the value does not exist (list index out of range, key does not exist on
@@ -131,7 +131,7 @@ class Maybe[T]:
             case _:
                 return Nothing
 
-    def then[R](self, func: Callable[[T], R]) -> R | None:
+    def then[U](self, func: Callable[[T], U]) -> U | None:
         """
         Returns ``func`` called with this instance's wrapped value if ``Some``, otherwise returns ``None``.
 

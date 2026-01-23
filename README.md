@@ -86,26 +86,42 @@ from maybetype import maybe, Some
 match maybe(1):
     case Some(val):
         print('Value: ', val)
-    case _:
+    case _: # "case Nothing:" also works, but just matching else in this case will be identical
         print('No value')
 ```
 
 ## Other examples
 
-Converting a `str | None` timestamp into a `datetime` object if not `None`, otherwise returning `None`:
+Converting a `str | None` timestamp into a `datetime` object if not `None`, otherwise returning
+`None`:
 
 ```python
 from datetime import datetime
 from maybetype import maybe
 
-date = maybe('2025-09-06T030000').then(datetime.fromisoformat)
-# date == datetime.datetime(2025, 9, 6, 3, 0)
+assert maybe('2025-09-06T030000').then(datetime.fromisoformat) == datetime.datetime(2025, 9, 6, 3, 0)
 
-date = maybe(date_str).then(datetime.fromisoformat)
-# date == None
+assert maybe(date_str).then(datetime.fromisoformat) is None
 
-date = maybe('' or None).then(datetime.fromisoformat)
-# date == None
+assert maybe('' or None).then(datetime.fromisoformat) is None
 # Maybe does not treat falsy values as None, only strictly x-is-None values
 # Without `or None` here, datetime.fromisoformat would have raised a ValueError
+```
+
+Converting a `str | None` timestamp into a `datetime` object if not `None`, then ensuring that date
+meets certain criteria:
+
+```python
+from datetime import datetime
+from maybetype import maybe
+
+assert maybe('2025-09-06T030000').and_then(datetime.fromisoformat).test(lambda dt: dt.year > 2024)
+
+assert not maybe('2024-09-06T030000').and_then(datetime.fromisoformat).test(lambda dt: dt.year > 2024)
+
+match maybe('2025-09-06T030000').and_then(datetime.fromisoformat).test(lambda dt: dt.year > 2024):
+    case Some(date):
+        ... # Do something with the date
+    case _:
+        ... # Do something else
 ```

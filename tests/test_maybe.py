@@ -13,6 +13,9 @@ from maybetype import Maybe, Nothing, Some, _Nothing, maybe
 ALPHANUMERIC: str = ascii_lowercase + '0123456789'
 MAYBE_UNWRAP_NONE_REGEX: re.Pattern[str] = re.compile(r"Maybe\[.*\] unwrapped into None")
 
+def square(n: int) -> int:
+    return n * n
+
 def test_maybe_none_unwrap_error() -> None:
     m_none: Maybe[Any] = Nothing
     assert bool(m_none) is False
@@ -192,3 +195,14 @@ def test_maybe_pattern_matching[T](value: T, predicate: Callable[[T], bool], exp
             result = None
 
     assert result == expected
+
+@pytest.mark.parametrize(('value', 'fn', 'expected'),
+    [
+        (None, square, Nothing),
+        (0, square, Some(0)),
+        (5, square, Some(25)),
+        ('image.png', lambda s: s.split('.')[0], Some('image')),
+    ],
+)
+def test_maybe_and_then[T, U](value: T, fn: Callable[[T], U], expected: Maybe[T]) -> None:
+    assert maybe(value).and_then(fn) == expected

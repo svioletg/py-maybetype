@@ -14,6 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `test()`: Returns `Some` if the instance is `Some` and the test function returns `True` when
     called with the wrapped value, otherwise returns `Nothing`
 
+### Changed
+
+- Most type signatures now use the more standard type variable naming of `T`, `U`, `V`...
+  - The only exception currently is the static method `Maybe.map()`, which uses `A` and `B` since
+    `T` already belongs the `Maybe` class' scope and the method operates on unrelated types
+
 ## [0.6.0] - 2026-01-21
 
 ### Changed
