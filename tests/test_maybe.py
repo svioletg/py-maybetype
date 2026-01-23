@@ -8,7 +8,7 @@ from typing import Any
 
 import pytest
 
-from maybetype import Maybe, Nothing, Some, maybe
+from maybetype import Maybe, Nothing, Some, _Nothing, maybe
 
 ALPHANUMERIC: str = ascii_lowercase + '0123456789'
 MAYBE_UNWRAP_NONE_REGEX: re.Pattern[str] = re.compile(r"Maybe\[.*\] unwrapped into None")
@@ -23,6 +23,22 @@ def test_maybe_none_unwrap_error() -> None:
 
 def test_maybe_none_is_nothing() -> None:
     assert maybe(None) is Nothing
+
+@pytest.mark.parametrize(('val'),
+    [
+        None,
+        0,
+        1,
+        '',
+        'string',
+        [],
+        [1, 2, 3],
+        True,
+        False,
+    ],
+)
+def test_nothing_instance_always_wraps_none(val: object) -> None:
+    assert _Nothing(val).val is None # type: ignore
 
 def test_maybe_this_or() -> None:
     assert Maybe.int('10').this_or(0).unwrap() == 10  # noqa: PLR2004

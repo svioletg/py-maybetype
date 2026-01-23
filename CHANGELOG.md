@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Added methods to `Maybe`:
+  - `and_then()`: Similar to `Maybe.then()`, but returns a `Maybe` instance
+  - `test()`: Returns `Some` if the instance is `Some` and the test function returns `True` when
+    called with the wrapped value, otherwise returns `Nothing`
+
 ## [0.6.0] - 2026-01-21
 
 ### Changed

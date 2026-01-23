@@ -98,16 +98,13 @@ Converting a `str | None` timestamp into a `datetime` object if not `None`, othe
 from datetime import datetime
 from maybetype import maybe
 
-date_str = '2025-09-06T030000'
 date = maybe('2025-09-06T030000').then(datetime.fromisoformat)
 # date == datetime.datetime(2025, 9, 6, 3, 0)
 
-date_str = None
 date = maybe(date_str).then(datetime.fromisoformat)
 # date == None
 
-date_str = ''
-date = maybe(date_str or None).then(datetime.fromisoformat)
+date = maybe('' or None).then(datetime.fromisoformat)
 # date == None
 # Maybe does not treat falsy values as None, only strictly x-is-None values
 # Without `or None` here, datetime.fromisoformat would have raised a ValueError

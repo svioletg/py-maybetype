@@ -62,6 +62,13 @@ class Maybe[T]:
         """Maps ``fn`` onto ``vals``, taking the unwrapped values of ``Some``s and discarding ``Nothing``s."""
         return [i.unwrap() for i in map(fn, vals) if i]
 
+    def and_then[R](self, func: Callable[[T], R]) -> 'Maybe[R]':
+        """
+        Like :py:meth:`~maybetype.Maybe.then`, but returns a ``Maybe`` instance instead—``Nothing`` if this instance
+        is a ``Nothing``, ``Some(R)`` if the instance is ``Some``, where ``R`` is the returned value of ``func``.
+        """
+        return Some(func(self.val)) if self.val is not None else Nothing
+
     def attr[V](self, name: str, typ: type[V] | None = None, *, err: bool = False) -> 'Maybe[V]':
         """
         Attempts to access an attribute ``name`` on the wrapped object, returning a ``Some`` instance wrapping the
@@ -112,10 +119,21 @@ class Maybe[T]:
                     raise
         return maybe(default)
 
+    def test(self, predicate: Callable[[T], bool]) -> 'Maybe[T]':
+        """
+        Returns ``Nothing`` if the wrapped value does not return ``True`` when passed to ``predicate``, otherwise
+        returns the instance the method was called from. When called from a ``Nothing`` instance, ``Nothing`` is always
+        returned.
+        """
+        match self:
+            case Some(val):
+                return self if predicate(val) else Nothing
+            case _:
+                return Nothing
+
     def then[R](self, func: Callable[[T], R]) -> R | None:
         """
-        Calls ``func`` with the wrapped value as the argument and returns its value, or returns ``None`` if the wrapped
-        value is ``None``.
+        Returns ``func`` called with this instance's wrapped value if ``Some``, otherwise returns ``None``.
 
         :param func: A ``Callable`` which takes a type of the possible wrapped value (``T``) and can return any type
             (``R``).
