@@ -11,6 +11,7 @@ Generally, more significant breaking changes will be put near the top of each ca
 
 ### Added
 
+- Added static method `Maybe.sequence()`
 - Added methods to `Maybe`:
   - `and_then()`: Similar to `Maybe.then()`, but returns a `Maybe` instance
   - `test()`: Returns `Some` if the instance is `Some` and the test function returns `True` when
@@ -18,7 +19,7 @@ Generally, more significant breaking changes will be put near the top of each ca
 
 ### Changed
 
-- Renamed method `Maybe.int()` to `Maybe.try_int()`
+- Renamed static method `Maybe.int()` to `Maybe.try_int()`
 - `Maybe.__hash__()` now returns `hash()` called with the wrapped value instead of accessing its
   `__hash__()` method
 - Most type signatures now use the more standard type variable naming of `T`, `U`, `V`...

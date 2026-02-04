@@ -1,5 +1,5 @@
 import re
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from copy import deepcopy
 from dataclasses import dataclass
 from string import ascii_lowercase
@@ -209,3 +209,13 @@ def test_maybe_pattern_matching[T](value: T, predicate: Callable[[T], bool], exp
 )
 def test_maybe_and_then[T, U](value: T, fn: Callable[[T], U], expected: Maybe[T]) -> None:
     assert maybe(value).and_then(fn) == expected
+
+@pytest.mark.parametrize(('vals', 'expected'),
+    [
+        ([Some(1), Some(2), Some(3)], Some([1, 2, 3])),
+        ([Some(1), Nothing, Some(3)], Nothing),
+        ([Nothing, Nothing, Nothing], Nothing),
+    ],
+)
+def test_maybe_sequence[T](vals: Iterable[Maybe[T]], expected: Maybe[list[T]]) -> None:
+    assert Maybe.sequence(vals) == expected

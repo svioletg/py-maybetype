@@ -51,6 +51,22 @@ class Maybe[T]:
         return [i.unwrap() for i in map(fn, vals) if i]
 
     @staticmethod
+    def sequence(vals: 'Iterable[Maybe[T]]') -> 'Maybe[list[T]]':
+        """
+        Returns ``Nothing`` if any of ``vals`` is ``Nothing``, otherwise returns a ``Some`` of a list of unwrapped
+        items of ``vals``.
+
+        >>> assert Maybe.sequence([Some(1), Some(2), Some(3)]) == Some([1, 2, 3])
+        >>> assert Maybe.sequence([Some(1), Nothing, Some(3)]) is Nothing
+        """
+        unwrapped: list[T] = []
+        for i in vals:
+            if i is Nothing:
+                return Nothing
+            unwrapped.append(i.unwrap())
+        return Some(unwrapped)
+
+    @staticmethod
     def try_int(val: Any) -> 'Maybe[int]':  # noqa: ANN401
         """
         Attempts to convert ``val`` to an ``int``, returning a ``Some``-wrapped ``int`` if successful, or
