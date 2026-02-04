@@ -156,10 +156,6 @@ class Maybe[T]:
         """
         return func(self.val) if self.val is not None else None
 
-    def this_or(self, other: T) -> 'Maybe[T]':
-        """Returns the original wrapped value if not ``None``, otherwise returns a ``Some``-wrapped ``other``."""
-        return self if self else Some(other)
-
     def unwrap(self,
             exc: Exception | Callable[..., Never] | None = None,
             *exc_args: object,

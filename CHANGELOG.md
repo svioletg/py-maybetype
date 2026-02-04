@@ -26,6 +26,11 @@ Generally, more significant breaking changes will be put near the top of each ca
   - The only exception currently is the static method `Maybe.map()`, which uses `A` and `B` since
     `T` already belongs the `Maybe` class' scope and the method operates on unrelated types
 
+### Removed
+
+- Removed method `Maybe.this_or()`
+  - Redundant, `maybe(x).this_or(y)` is exactly the same as `maybe(x) or Some(y)`
+
 ## [0.6.0] - 2026-01-21
 
 ### Changed

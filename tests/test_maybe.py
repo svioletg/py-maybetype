@@ -43,9 +43,9 @@ def test_maybe_none_is_nothing() -> None:
 def test_nothing_instance_always_wraps_none(val: object) -> None:
     assert _Nothing(val).val is None # type: ignore
 
-def test_maybe_this_or() -> None:
-    assert Maybe.try_int('10').this_or(0).unwrap() == 10  # noqa: PLR2004
-    assert Maybe.try_int('ten').this_or(0).unwrap() == 0
+def test_maybe_or() -> None:
+    assert Maybe.try_int('10') or Some(0).unwrap() == 10  # noqa: PLR2004
+    assert Maybe.try_int('ten') or Some(0).unwrap() == 0
     with pytest.raises(ValueError, match=MAYBE_UNWRAP_NONE_REGEX):
         Maybe.try_int('ten').unwrap()
 
