@@ -6,7 +6,7 @@ from string import ascii_lowercase
 from types import EllipsisType
 from typing import Any
 
-import pytest
+import pytest  # ty:ignore[unresolved-import, unused-ignore-comment]; seems to only show up in workflow runs?
 
 from maybetype import Maybe, Nothing, Some, _Nothing, maybe
 
