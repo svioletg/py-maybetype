@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/maybetype
+      url: https://pypi.org/p/py-maybetype
     permissions:
       id-token: write
     steps:
@@ -59,7 +59,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: testpypi
-      url: https://test.pypi.org/p/maybetype
+      url: https://test.pypi.org/p/py-maybetype
     permissions:
       id-token: write
     steps:
