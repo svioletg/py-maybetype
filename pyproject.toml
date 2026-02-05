@@ -1,6 +1,6 @@
 [project]
 name = "py-maybetype"
-version = "0.6.0"
+version = "0.7.0"
 description = "A basic implementation of a maybe/option type in Python, largely inspired by Rust's Option."
 authors = [
     { name = "Seth 'Violet' Gibbs" }
@@ -17,6 +17,7 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
 ]
 
 [project.urls]
@@ -30,8 +31,8 @@ Issues = "https://github.com/svioletg/py-maybetype/issues"
 dev = [
     "ipython>=9.10.0",
     "pytest>=9.0.2",
-    "ruff>=0.14.8",
-    "ty>=0.0.13",
+    "ruff>=0.15.0",
+    "ty>=0.0.15",
 ]
 docs = [
     "furo>=2025.12.19",
