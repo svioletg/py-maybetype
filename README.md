@@ -1,6 +1,6 @@
 # py-maybetype
 
-![Linting & testing](https://github.com/svioletg/py-maybetype/actions/workflows/python-lint-test.yml/badge.svg)
+![Linting & testing](https://github.com/svioletg/py-maybetype/actions/workflows/lint-test.yml/badge.svg)
 
 Documentation: <https://py-maybetype.readthedocs.io/en/latest/>
 
