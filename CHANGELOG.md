@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Generally, more significant breaking changes will be put near the top of each category.
 
+## [Unreleased]
+
+### Changed
+
+- Updated the docstring for `Maybe.unwrap_or()` for slightly more clarity
+
 ## [0.7.0]
 
 ### Added

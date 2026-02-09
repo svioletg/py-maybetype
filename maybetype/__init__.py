@@ -179,7 +179,7 @@ class Maybe[T]:
         return self.val
 
     def unwrap_or(self, other: T) -> T:
-        """Returns the wrapped value if it is not ``None``, otherwise returns ``other``."""
+        """Returns the wrapped value of a ``Some``, otherwise returns ``other``."""
         return self.val if self.val is not None else other
 
 class Some[T](Maybe[T]):
