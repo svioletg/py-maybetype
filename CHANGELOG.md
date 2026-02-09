@@ -9,9 +9,18 @@ Generally, more significant breaking changes will be put near the top of each ca
 
 ## [Unreleased]
 
+### Added
+
+- Added test `test_maybe.test_unwrap_nothing_callback`
+
 ### Changed
 
 - Updated the docstring for `Maybe.unwrap_or()` for slightly more clarity
+- Changed `Maybe.unwrap()` default error message to a more succinct "unwrapped Nothing"
+- Renamed multiple tests in module `test_maybe`:
+  - `test_maybe_none_unwrap_error` → `test_unwrap_nothing`
+  - `test_maybe_unwrap_or` → `test_unwrap_or`
+  - `test_maybe_pattern_matching` → `test_pattern_matching`
 
 ## [0.7.0]
 

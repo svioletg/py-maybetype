@@ -159,23 +159,20 @@ class Maybe[T]:
 
     def unwrap(self,
             exc: Exception | Callable[..., Never] | None = None,
-            *exc_args: object,
         ) -> T:
         """
         Returns the wrapped value if it is not ``None``, otherwise raises ``ValueError`` by default.
 
         :param exc: The exception to raise if the wrapped value is ``None``. Can be either an ``Exception`` object, or a
-            ``Callable`` which takes any arguments and does not return. If given ``None``, the default behavior is to
-            raise a ``ValueError`` with the message ``Maybe[<type>] unwrapped into None``.
-        :param exc_args: Arguments to call ``exc`` with, if ``exc`` is a ``Callable``. Otherwise, this argument is not
-            used.
+            ``Callable`` which takes any arguments and does not return. If this is left ``None``, a ``ValueError``
+            is raised.
         """
         if self.val is None:
             if isinstance(exc, Exception):
                 raise exc
             if isinstance(exc, Callable):
-                exc(*exc_args)
-            raise ValueError(f'Maybe[{T.__name__}] unwrapped into None')
+                exc()
+            raise ValueError('unwrapped Nothing')
         return self.val
 
     def unwrap_or(self, other: T) -> T:

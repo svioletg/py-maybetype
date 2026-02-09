@@ -4,25 +4,27 @@ from copy import deepcopy
 from dataclasses import dataclass
 from string import ascii_lowercase
 from types import EllipsisType
-from typing import Any
 
 import pytest  # ty:ignore[unresolved-import, unused-ignore-comment]; seems to only show up in workflow runs?
 
 from maybetype import Maybe, Nothing, Some, _Nothing, maybe
 
 ALPHANUMERIC: str = ascii_lowercase + '0123456789'
-MAYBE_UNWRAP_NONE_REGEX: re.Pattern[str] = re.compile(r"Maybe\[.*\] unwrapped into None")
+MAYBE_UNWRAP_NONE_REGEX: re.Pattern[str] = re.compile(r"unwrapped Nothing")
 
 def square(n: int) -> int:
     return n * n
 
-def test_maybe_none_unwrap_error() -> None:
-    m_none: Maybe[Any] = Nothing
-    assert bool(m_none) is False
+def test_unwrap_nothing() -> None:
+    assert bool(Nothing) is False
     with pytest.raises(ValueError, match=MAYBE_UNWRAP_NONE_REGEX):
-        m_none.unwrap()
+        Nothing.unwrap()
     with pytest.raises(TypeError, match='Custom error message'):
-        m_none.unwrap(exc=TypeError('Custom error message'))
+        Nothing.unwrap(exc=TypeError('Custom error message'))
+
+def test_unwrap_nothing_callback() -> None:
+    with pytest.raises(SystemExit):
+        Nothing.unwrap(exc=exit)
 
 def test_maybe_none_is_nothing() -> None:
     assert maybe(None) is Nothing
@@ -57,7 +59,7 @@ def test_maybe_or() -> None:
         ('string', None),
     ],
 )
-def test_maybe_unwrap_or(val: object, default: object) -> None:
+def test_unwrap_or(val: object, default: object) -> None:
     assert maybe(val).unwrap_or(default) == val
     assert maybe(None).unwrap_or(default) == default
 
@@ -187,7 +189,7 @@ def test_maybe_with_predicate_and_test[T](value: T, predicate: Callable[[T], boo
         ('nf0cmmdq-l0gt-rq5a-upry-706trht3ocv9', is_valid_uuid, None),
     ],
 )
-def test_maybe_pattern_matching[T](value: T, predicate: Callable[[T], bool], expected: T | None) -> None:
+def test_pattern_matching[T](value: T, predicate: Callable[[T], bool], expected: T | None) -> None:
     if expected is Ellipsis:
         expected = value
 
