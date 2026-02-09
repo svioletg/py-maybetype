@@ -31,31 +31,9 @@ jobs:
         name: python-package-distributions
         path: dist/
 
-  publish-to-pypi:
-    name: >-
-      Publish Python distribution to PyPI
-    if: startswith(github.ref, 'refs/tags/')
-    needs:
-    - build
-    runs-on: ubuntu-latest
-    environment:
-      name: pypi
-      url: https://pypi.org/p/py-maybetype
-    permissions:
-      id-token: write
-    steps:
-    - name: Download all the dists
-      uses: actions/download-artifact@v6
-      with:
-        name: python-package-distributions
-        path: dist/
-    - name: Publish distribution to PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
-
   publish-to-testpypi:
     name: Publish Python distribution to TestPyPI
-    needs:
-    - build
+    needs: build
     runs-on: ubuntu-latest
     environment:
       name: testpypi
@@ -73,3 +51,23 @@ jobs:
       with:
         verbose: true
         repository-url: https://test.pypi.org/legacy/
+
+  publish-to-pypi:
+    name: >-
+      Publish Python distribution to PyPI
+    if: startswith(github.ref, 'refs/tags/')
+    needs: [build, publish-to-testpypi]
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/py-maybetype
+    permissions:
+      id-token: write
+    steps:
+    - name: Download all the dists
+      uses: actions/download-artifact@v6
+      with:
+        name: python-package-distributions
+        path: dist/
+    - name: Publish distribution to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
