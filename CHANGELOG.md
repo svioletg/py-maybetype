@@ -15,12 +15,16 @@ Generally, more significant breaking changes will be put near the top of each ca
 
 ### Changed
 
-- Updated the docstring for `Maybe.unwrap_or()` for slightly more clarity
+- Updated a number of docstrings to fix errors or improve clarity
 - Changed `Maybe.unwrap()` default error message to a more succinct "unwrapped Nothing"
+- Method `Maybe.unwrap()` argument `exc` can now also be a string, in which case `ValueError` is
+  raised with that string as its sole argument if the instance was `Nothing`
 - Renamed multiple tests in module `test_maybe`:
   - `test_maybe_none_unwrap_error` → `test_unwrap_nothing`
   - `test_maybe_unwrap_or` → `test_unwrap_or`
   - `test_maybe_pattern_matching` → `test_pattern_matching`
+- Renamed type variable `R` to `U` in signature of `Maybe.and_then()`
+- `exc` argument of method `Maybe.unwrap()` now expects a function that takes no arguments
 
 ## [0.7.0]
 

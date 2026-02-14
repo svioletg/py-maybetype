@@ -79,10 +79,10 @@ class Maybe[T]:
         except ValueError:
             return Nothing
 
-    def and_then[R](self, func: Callable[[T], R]) -> 'Maybe[R]':
+    def and_then[U](self, func: Callable[[T], U]) -> 'Maybe[U]':
         """
         Like :py:meth:`~maybetype.Maybe.then`, but returns a ``Maybe`` instance instead—``Nothing`` if this instance
-        is a ``Nothing``, ``Some(R)`` if the instance is ``Some``, where ``R`` is the returned value of ``func``.
+        is a ``Nothing``, ``Some(U)`` if the instance is ``Some``, where ``U`` is the returned value of ``func``.
         """
         return Some(func(self.val)) if self.val is not None else Nothing
 
@@ -110,18 +110,18 @@ class Maybe[T]:
 
     def get[U](self,
             accessor: Any,  # noqa: ANN401
-            _typ: type[U] | None = None,
+            typ: type[U] | None = None,
             *,
             err: bool = False,
             default: U | None = None,
         ) -> 'Maybe[U]':
         """
-        Attempts to access an item by ``accessor`` on the wrapped object, assuming the wrapped value implements
-        ``__getitem__``. If it does not, or if the value does not exist (list index out of range, key does not exist on
+        Attempts to access an item by ``accessor`` on the wrapped object if it supports ``__getitem__``.
+        If it does not, or if the value does not exist (list index out of range, key does not exist on
         a dictionary, etc.), ``Nothing`` is returned.
 
-        :param typ: Specifies the generic type of the resulting ``Maybe``. Note that the potential value returned by
-            this method will not be coerced to the given type at runtime; this argument is only for typing purposes.
+        :param typ: Specifies the generic type of the resulting ``Maybe``. No conversion is performed; this argument is
+            only for typing purposes.
         :param err: By default, ``IndexError`` and ``KeyError`` are not raised when ``__getitem__`` is called on the
             wrapped value, and ``Nothing`` is returned instead. Setting ``err`` to ``True`` allows these errors to
             be raised as they normally would. Note that if ``__getitem__`` did not exist on the wrapped value in the
@@ -130,7 +130,7 @@ class Maybe[T]:
         """
         if hasattr(self.val, '__getitem__'):
             try:
-                return Some(self.val.__getitem__(accessor)) # type: ignore
+                return Some(self.val.__getitem__(accessor))  # ty:ignore[call-non-callable]
             except (IndexError, KeyError):
                 if err:
                     raise
@@ -141,6 +141,10 @@ class Maybe[T]:
         Returns ``Nothing`` if the wrapped value does not return ``True`` when passed to ``predicate``, otherwise
         returns the instance the method was called from. When called from a ``Nothing`` instance, ``Nothing`` is always
         returned.
+
+        >>> assert Some(1).test(lambda n: n > 0).unwrap() == 1
+        >>> assert Some(1).test(lambda n: n > 1) is Nothing
+        >>> assert Nothing.test(lambda n: n > 1) is Nothing
         """
         match self:
             case Some(val):
@@ -153,21 +157,24 @@ class Maybe[T]:
         Returns ``func`` called with this instance's wrapped value if ``Some``, otherwise returns ``None``.
 
         :param func: A ``Callable`` which takes a type of the possible wrapped value (``T``) and can return any type
-            (``R``).
+            (``U``).
         """
         return func(self.val) if self.val is not None else None
 
     def unwrap(self,
-            exc: Exception | Callable[..., Never] | None = None,
+            exc: str | Exception | Callable[[], Never] | None = None,
         ) -> T:
         """
-        Returns the wrapped value if it is not ``None``, otherwise raises ``ValueError`` by default.
+        Returns the wrapped value if this instance is ``Some``, otherwise raises ``ValueError`` by default.
 
-        :param exc: The exception to raise if the wrapped value is ``None``. Can be either an ``Exception`` object, or a
-            ``Callable`` which takes any arguments and does not return. If this is left ``None``, a ``ValueError``
-            is raised.
+        :param exc: The exception to raise when unwrapping ``Nothing``. Can be a string, an ``Exception`` object, or a
+            ``Callable`` which takes no arguments and does not return. If a string is given, ``ValueError`` is raised
+            with it as the sole argument. If an ``Exception`` object is given, it is raised, and if a ``Callable`` is
+            given, it is called with no arguments.
         """
         if self.val is None:
+            if isinstance(exc, str):
+                raise ValueError(exc)
             if isinstance(exc, Exception):
                 raise exc
             if isinstance(exc, Callable):

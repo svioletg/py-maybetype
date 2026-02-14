@@ -29,6 +29,9 @@ def test_unwrap_nothing_callback() -> None:
 def test_maybe_none_is_nothing() -> None:
     assert maybe(None) is Nothing
 
+def test_equality() -> None:
+    assert maybe(1) == Some(1)
+
 @pytest.mark.parametrize(('val'),
     [
         None,
