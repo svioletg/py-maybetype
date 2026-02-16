@@ -19,12 +19,14 @@ def test_unwrap_nothing() -> None:
     assert bool(Nothing) is False
     with pytest.raises(ValueError, match=MAYBE_UNWRAP_NONE_REGEX):
         Nothing.unwrap()
-    with pytest.raises(TypeError, match='Custom error message'):
-        Nothing.unwrap(exc=TypeError('Custom error message'))
+    with pytest.raises(ValueError, match='Custom error message'):
+        Nothing.unwrap('Custom error message')
 
 def test_unwrap_nothing_callback() -> None:
+    with pytest.raises(TypeError):
+        Nothing.unwrap(TypeError('Nothing'))
     with pytest.raises(SystemExit):
-        Nothing.unwrap(exc=exit)
+        Nothing.unwrap(exit)
 
 def test_maybe_none_is_nothing() -> None:
     assert maybe(None) is Nothing
