@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Generally, more significant breaking changes will be put near the top of each category.
 
-## [Unreleased]
+## [0.8.0]
 
 ### Added
 
