@@ -35,6 +35,9 @@ class Maybe[T]:
     def __hash__(self) -> int:
         return hash(self.val)
 
+    def __or__(self, default: T) -> T:
+        return self.unwrap_or(default)
+
     @staticmethod
     def cat(vals: 'Iterable[Maybe[T]]') -> list[T]:
         """

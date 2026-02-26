@@ -67,6 +67,9 @@ def test_maybe_or() -> None:
 def test_unwrap_or(val: object, default: object) -> None:
     assert maybe(val).unwrap_or(default) == val
     assert maybe(None).unwrap_or(default) == default
+    # Try bitwise operator version
+    assert maybe(val) | default == val
+    assert maybe(None) | default == default
 
 @pytest.mark.parametrize(('val', 'then_fn'),
     [
