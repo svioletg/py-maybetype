@@ -9,6 +9,12 @@ Generally, more significant breaking changes will be put near the top of each ca
 
 ## [Unreleased]
 
+### Changed
+
+- Removed type variable from signature of `_Nothing` class as it's never used
+- Replaced `# type: ignore` directive in test `test_maybe.test_nothing_instance_always_wraps_none`
+  with more specific `# ty:ignore[invalid-argument-type]` directive
+
 ### Fixed
 
 - Fixed incorrectly written test `test_maybe.test_maybe_or`

@@ -193,7 +193,7 @@ class Some[T](Maybe[T]):
     def __bool__(self) -> bool:
         return True
 
-class _Nothing[T](Maybe[T]):
+class _Nothing(Maybe):
     __match_args__ = ()
 
     def __init__(self, _: None = None) -> None:

@@ -48,7 +48,7 @@ def test_equality() -> None:
     ],
 )
 def test_nothing_instance_always_wraps_none(val: object) -> None:
-    assert _Nothing(val).val is None # type: ignore
+    assert _Nothing(val).val is None  # ty:ignore[invalid-argument-type]
 
 def test_maybe_or() -> None:
     assert (Maybe.try_int('10') or Some(0)).unwrap() == 10  # noqa: PLR2004
