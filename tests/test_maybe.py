@@ -33,6 +33,8 @@ def test_maybe_none_is_nothing() -> None:
 
 def test_equality() -> None:
     assert maybe(1) == Some(1)
+    assert maybe(1) != Some(2)
+    assert maybe(1) != Nothing
 
 @pytest.mark.parametrize(('val'),
     [
@@ -226,3 +228,13 @@ def test_maybe_and_then[T, U](value: T, fn: Callable[[T], U], expected: Maybe[T]
 )
 def test_maybe_sequence[T](vals: Iterable[Maybe[T]], expected: Maybe[list[T]]) -> None:
     assert Maybe.sequence(vals) == expected
+
+@pytest.mark.parametrize(('m', 'func', 'expected'),
+    [
+        (Some('1'), Maybe.try_int, Some(1)),
+        (Some('one'), Maybe.try_int, Nothing),
+        (Nothing, Maybe.try_int, Nothing),
+    ],
+)
+def test_bind[T, U](m: Maybe[T], func: Callable[[T], Maybe[U]], expected: Maybe[U]) -> None:
+    assert m.bind(func) == expected

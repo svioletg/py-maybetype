@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import warnings
 from collections.abc import Callable, Iterable
 from typing import Any, Never
@@ -16,7 +18,7 @@ class Maybe[T]:
             + ' use the maybe() function instead',
             stacklevel=2,
         )
-        self.val = val
+        self.val: T | None = val
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}({self.val!r})'
@@ -36,7 +38,7 @@ class Maybe[T]:
         return hash(self.val)
 
     @staticmethod
-    def cat(vals: 'Iterable[Maybe[T]]') -> list[T]:
+    def cat(vals: Iterable[Maybe[T]]) -> list[T]:
         """
         Takes an iterable of ``Maybe`` and returns a list of the unwrapped values of all ``Some`` objects.
 
@@ -47,12 +49,12 @@ class Maybe[T]:
         return [i.unwrap() for i in vals if i]
 
     @staticmethod
-    def map[A, B](fn: 'Callable[[A], Maybe[B]]', vals: Iterable[A]) -> list[B]:
+    def map[A, B](fn: Callable[[A], Maybe[B]], vals: Iterable[A]) -> list[B]:
         """Maps ``fn`` onto ``vals``, taking the unwrapped values of ``Some``s and discarding ``Nothing``s."""
         return [i.unwrap() for i in map(fn, vals) if i]
 
     @staticmethod
-    def sequence(vals: 'Iterable[Maybe[T]]') -> 'Maybe[list[T]]':
+    def sequence(vals: Iterable[Maybe[T]]) -> Maybe[list[T]]:
         """
         Returns ``Nothing`` if any of ``vals`` is ``Nothing``, otherwise returns a ``Some`` of a list of unwrapped
         items of ``vals``.
@@ -68,7 +70,7 @@ class Maybe[T]:
         return Some(unwrapped)
 
     @staticmethod
-    def try_int(val: Any) -> 'Maybe[int]':  # noqa: ANN401
+    def try_int(val: Any) -> Maybe[int]:  # noqa: ANN401
         """
         Attempts to convert ``val`` to an ``int``, returning a ``Some``-wrapped ``int`` if successful, or
         ``Nothing`` on failure.
@@ -79,14 +81,14 @@ class Maybe[T]:
         except ValueError:
             return Nothing
 
-    def and_then[U](self, func: Callable[[T], U]) -> 'Maybe[U]':
+    def and_then[U](self, func: Callable[[T], U]) -> Maybe[U]:
         """
         Like :py:meth:`~maybetype.Maybe.then`, but returns a ``Maybe`` instance instead—``Nothing`` if this instance
         is a ``Nothing``, ``Some(U)`` if the instance is ``Some``, where ``U`` is the returned value of ``func``.
         """
         return Some(func(self.val)) if self.val is not None else Nothing
 
-    def attr[U](self, name: str, typ: type[U] | None = None, *, err: bool = False) -> 'Maybe[U]':
+    def attr[U](self, name: str, typ: type[U] | None = None, *, err: bool = False) -> Maybe[U]:
         """
         Attempts to access an attribute ``name`` on the wrapped object, returning a ``Some`` instance wrapping the
         the value if it exists, or ``Nothing`` otherwise.
@@ -108,13 +110,22 @@ class Maybe[T]:
         except AttributeError:
             return default
 
+    def bind[U](self, func: Callable[[T], Maybe[U]]) -> Maybe[U]:
+        """
+        Returns the result of ``func`` called with the wrapped value as its argument if ``Some``, otherwise returns
+        ``Nothing``.
+        """
+        if self.val is None:
+            return Nothing
+        return func(self.val)
+
     def get[U](self,
             accessor: Any,  # noqa: ANN401
             typ: type[U] | None = None,
             *,
             err: bool = False,
             default: U | None = None,
-        ) -> 'Maybe[U]':
+        ) -> Maybe[U]:
         """
         Attempts to access an item by ``accessor`` on the wrapped object if it supports ``__getitem__``.
         If it does not, or if the value does not exist (list index out of range, key does not exist on
@@ -136,7 +147,7 @@ class Maybe[T]:
                     raise
         return maybe(default)
 
-    def test(self, predicate: Callable[[T], bool]) -> 'Maybe[T]':
+    def test(self, predicate: Callable[[T], bool]) -> Maybe[T]:
         """
         Returns ``Nothing`` if the wrapped value does not return ``True`` when passed to ``predicate``, otherwise
         returns the instance the method was called from. When called from a ``Nothing`` instance, ``Nothing`` is always

@@ -9,11 +9,21 @@ Generally, more significant breaking changes will be put near the top of each ca
 
 ## [Unreleased]
 
+### Added
+
+- Added method `Maybe.bind`
+  - Largely the same as Haskell's `>>=`, `x.bind(f)` is essentially the same as `x >>= f`
+- Added test `test_maybe.test_bind`
+
 ### Changed
 
+- Added `from __future__ import annotations` import to `maybetype/__init__.py` for unquoted forward
+  references
+- Added type annotation to `Maybe.val` in `Maybe.__init__` to give more specificity for `ty`
 - Removed type variable from signature of `_Nothing` class as it's never used
 - Replaced `# type: ignore` directive in test `test_maybe.test_nothing_instance_always_wraps_none`
   with more specific `# ty:ignore[invalid-argument-type]` directive
+- Expanded test `test_maybe.test_equality` slightly
 
 ### Fixed
 
