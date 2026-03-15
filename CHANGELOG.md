@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Generally, more significant breaking changes will be put near the top of each category.
 
-## [Unreleased]
+## [0.9.0] - 2026-03-15
 
 ### Added
 
@@ -29,7 +29,7 @@ Generally, more significant breaking changes will be put near the top of each ca
 
 - Fixed incorrectly written test `test_maybe.test_maybe_or`
 
-## [0.8.0]
+## [0.8.0] - 2026-02-16
 
 ### Added
 
@@ -48,7 +48,7 @@ Generally, more significant breaking changes will be put near the top of each ca
 - Renamed type variable `R` to `U` in signature of `Maybe.and_then()`
 - `exc` argument of method `Maybe.unwrap()` now expects a function that takes no arguments
 
-## [0.7.0]
+## [0.7.0] - 2026-02-05
 
 ### Added
 
