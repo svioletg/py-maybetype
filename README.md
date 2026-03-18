@@ -6,15 +6,15 @@ Documentation: <https://py-maybetype.readthedocs.io/en/latest/>
 
 PyPI: <https://pypi.org/project/py-maybetype/>
 
+> [!WARNING]
+> I'm not considering any version before 1.0 stable, and breaking changes are likely with each 0.x
+> release. Though I'm using it in my own projects, I wouldn't consider it "production-ready" until
+
 A basic implementation of a maybe/option type in Python, largely inspired by Rust's `Option`.
 This was created as part of a separate project I had been working on, but I decided to make it into
 its own package as I wanted to use it elsewhere and its scope grew. This is not meant to be a 1:1
-replication or replacement for Rust's `Option` or Haskell's `Maybe`, but rather just an
+replication or replacement for Rust's `Option` or Haskell's `Maybe`, but rather an
 interperetation of the idea that I feel works for Python.
-
-> [!WARNING]
-> Breaking changes are likely each update in the 0.x phase. Please check the changelog for these
-> changes before updating to a new version.
 
 ## Usage
 

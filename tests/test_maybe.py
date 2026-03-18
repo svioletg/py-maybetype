@@ -7,7 +7,7 @@ from types import EllipsisType
 
 import pytest  # ty:ignore[unresolved-import, unused-ignore-comment]; seems to only show up in workflow runs?
 
-from maybetype import Maybe, Nothing, Some, _Nothing, maybe
+from maybetype import Maybe, Nothing, NothingType, Some, maybe
 
 ALPHANUMERIC: str = ascii_lowercase + '0123456789'
 MAYBE_UNWRAP_NONE_REGEX: re.Pattern[str] = re.compile(r"unwrapped Nothing")
@@ -50,7 +50,7 @@ def test_equality() -> None:
     ],
 )
 def test_nothing_instance_always_wraps_none(val: object) -> None:
-    assert _Nothing(val).val is None  # ty:ignore[invalid-argument-type]
+    assert NothingType(val).val is None  # ty:ignore[invalid-argument-type]
 
 def test_maybe_or() -> None:
     assert (Maybe.try_int('10') or Some(0)).unwrap() == 10  # noqa: PLR2004
@@ -238,3 +238,14 @@ def test_maybe_sequence[T](vals: Iterable[Maybe[T]], expected: Maybe[list[T]]) -
 )
 def test_bind[T, U](m: Maybe[T], func: Callable[[T], Maybe[U]], expected: Maybe[U]) -> None:
     assert m.bind(func) == expected
+
+@pytest.mark.parametrize(('m_a', 'm_b', 'func', 'expected'),
+    [
+        (Some(1), Some(2), lambda a, b: a + b, Some(3)),
+        (Some(1), Nothing, lambda a, b: a + b, Some(1)),
+        (Nothing, Some(2), lambda a, b: a + b, Some(2)),
+        (Nothing, Nothing, lambda a, b: a + b, Nothing),
+    ],
+)
+def test_reduce[T, U, R](m_a: Maybe[T], m_b: Maybe[U], func: Callable[[T, U], R], expected: Maybe) -> None:
+    assert m_a.reduce(m_b, func) == expected

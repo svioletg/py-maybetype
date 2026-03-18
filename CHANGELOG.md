@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Generally, more significant breaking changes will be put near the top of each category.
 
+## Unreleased
+
+### Added
+
+- Added method `Maybe.reduce`
+  - Replicates Rust's [`Option::reduce`](https://doc.rust-lang.org/std/option/enum.Option.html#method.reduce)
+- Added test `test_maybe.test_reduce`
+
+### Changed
+
+- Renamed class `_Nothing` to `NothingType`
+  - The class was marked as private to encourage use of the `Nothing` singleton instead, but since
+    one could want to use the class for type annotations, and the singleton can't be used for
+    annotations, it was renamed to both make it no longer private and clarify that it is the type
+
 ## [0.9.0] - 2026-03-15
 
 ### Added

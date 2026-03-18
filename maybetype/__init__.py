@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Callable, Iterable
-from typing import Any, Never
+from typing import Any, Never, Self
 
 
 class Maybe[T]:
@@ -147,6 +147,22 @@ class Maybe[T]:
                     raise
         return maybe(default)
 
+    def reduce[U, R](self, other: Maybe[U], func: Callable[[T, U], R]) -> Self | Maybe[U] | Maybe[R]:
+        """
+        Reduces the values of two ``Maybe`` instances to one value returned in a new ``Maybe`` using ``func``.
+
+        If only one of ``self`` and ``other`` is ``Some``, that instance is returned. If neither are, ``Nothing`` is
+        returned.
+
+        >>> assert Some(1).reduce(Some(2), lambda a, b: a + b) == Some(3)
+        >>> assert Some(1).reduce(Nothing, lambda a, b: a + b) == Some(1)
+        >>> assert Nothing.reduce(Some(2), lambda a, b: a + b) == Some(2)
+        >>> assert Nothing.reduce(Nothing, lambda a, b: a + b) is Nothing
+        """
+        if self and other:
+            return Some(func(self.unwrap(), other.unwrap()))
+        return self or other
+
     def test(self, predicate: Callable[[T], bool]) -> Maybe[T]:
         """
         Returns ``Nothing`` if the wrapped value does not return ``True`` when passed to ``predicate``, otherwise
@@ -204,7 +220,7 @@ class Some[T](Maybe[T]):
     def __bool__(self) -> bool:
         return True
 
-class _Nothing(Maybe):
+class NothingType(Maybe):
     __match_args__ = ()
 
     def __init__(self, _: None = None) -> None:
@@ -216,7 +232,7 @@ class _Nothing(Maybe):
     def __bool__(self) -> bool:
         return False
 
-Nothing = _Nothing()
+Nothing = NothingType()
 
 def maybe[T](val: T | None, predicate: Callable[[T], bool] = lambda v: v is not None) -> Maybe[T]:
     """
