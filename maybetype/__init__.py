@@ -10,7 +10,7 @@ class Maybe[T]:
     Wraps a value that may be ``T`` or ``None``, providing methods for conditionally using that value or
     short-circuiting to ``None`` without longer checks.
     """
-    __match_args__ = ('val',)
+    __match_args__ = ('_val',)
 
     def __init__(self, val: T | None) -> None:
         warnings.warn(
@@ -18,13 +18,13 @@ class Maybe[T]:
             + ' use the maybe() function instead',
             stacklevel=2,
         )
-        self.val: T | None = val
+        self._val: T | None = val
 
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__}({self.val!r})'
+        return f'{self.__class__.__name__}({self._val!r})'
 
     def __bool__(self) -> bool:
-        return self.val is not None
+        return self._val is not None
 
     def __eq__(self, other: object) -> bool:
         """
@@ -32,10 +32,10 @@ class Maybe[T]:
         """
         if not isinstance(other, Maybe):
             return False
-        return self.val == other.val
+        return self._val == other._val
 
     def __hash__(self) -> int:
-        return hash(self.val)
+        return hash(self._val)
 
     @staticmethod
     def cat(vals: Iterable[Maybe[T]]) -> list[T]:
@@ -81,38 +81,34 @@ class Maybe[T]:
         Returns the result of ``func`` (which must return a ``Maybe``) called with this instance's wrapped value if
         ``Some``, otherwise returns ``Nothing``.
         """
-        return func(self.val) if self.val is not None else Nothing
+        return func(self._val) if self._val is not None else Nothing
 
-    def attr[U](self, name: str, typ: type[U] | None = None, *, err: bool = False) -> Maybe[U]:
+    def attr[U](self, name: str, default: U | None = None, typ: type[U] | None = None) -> Maybe[U]:
         """
         Attempts to access an attribute ``name`` on the wrapped object, returning a ``Some`` instance wrapping the
         the value if it exists, or ``Nothing`` otherwise.
 
-        :param typ: Specifies the generic type of the resulting ``Maybe``. Note that the potential value returned by
-            this method will not be coerced to the given type at runtime; this argument is only for typing purposes.
-        :param err: If ``True``, ``AttributeError`` is raised instead of returning ``Nothing`` if ``name`` does not
-            exist.
-        """
-        return Some(getattr(self.val, name)) if err else maybe(getattr(self.val, name, None))
-
-    def attr_or[U](self, name: str, default: U) -> U:
-        """
-        Similar to the ``attr`` method, but unwraps the result if the attribute exists or returns the required default
-        value otherwise.
+        :param name: The name of the attribute to access.
+        :param default: An optional default value to use if the attribute does not exist, returning ``Some(default)``
+            in that case.
+        :param typ: Specifies the generic type of the resulting ``Maybe``. This does not affect the value's real type
+            at runtime; it is only used for type checkers.
+            This is generally unnecessary if the ``default`` parameter is given, as the type will be inferred from its
+            value.
         """
         try:
-            return self.attr(name, err=True).unwrap()
+            return Some(getattr(self._val, name) if default is None else getattr(self._val, name, default))
         except AttributeError:
-            return default
+            return Nothing
 
     def bind[U](self, func: Callable[[T], Maybe[U]]) -> Maybe[U]:
         """
         Returns the result of ``func`` called with the wrapped value as its argument if ``Some``, otherwise returns
         ``Nothing``.
         """
-        if self.val is None:
+        if self._val is None:
             return Nothing
-        return func(self.val)
+        return func(self._val)
 
     def filter(self, predicate: Callable[[T], bool]) -> Maybe[T]:
         """
@@ -123,7 +119,7 @@ class Maybe[T]:
         >>> assert Some(1).filter(lambda n: n > 1) is Nothing
         >>> assert Nothing.filter(lambda n: n > 1) is Nothing
         """
-        return self if (self.val is not None) and predicate(self.val) else Nothing
+        return self if (self._val is not None) and predicate(self._val) else Nothing
 
     def get[U](self,
             accessor: Any,  # noqa: ANN401
@@ -145,9 +141,9 @@ class Maybe[T]:
             first placed (such as with ``Nothing``), no error is raised, and ``Nothing`` is returned regardless.
         :param default: Specifies an alternate value to return a ``Some`` of instead of returning ``Nothing``.
         """
-        if hasattr(self.val, '__getitem__'):
+        if hasattr(self._val, '__getitem__'):
             try:
-                return Some(self.val.__getitem__(accessor))  # ty:ignore[call-non-callable]
+                return Some(self._val.__getitem__(accessor))  # ty:ignore[call-non-callable]
             except (IndexError, KeyError):
                 if err:
                     raise
@@ -158,7 +154,7 @@ class Maybe[T]:
         Returns a new ``Maybe`` with the result of calling ``func`` with the wrapped value of this instance if
         ``Some``, otherwise returns ``Nothing``.
         """
-        return Some(func(self.val)) if self.val is not None else Nothing
+        return Some(func(self._val)) if self._val is not None else Nothing
 
     def reduce[U, R](self, other: Maybe[U], func: Callable[[T, U], R]) -> Self | Maybe[U] | Maybe[R]:
         """
@@ -183,7 +179,7 @@ class Maybe[T]:
         """
         if not self:
             return Nothing
-        self.val = new_val
+        self._val = new_val
         return self
 
     def then[U](self, func: Callable[[T], U]) -> U | None:
@@ -193,7 +189,7 @@ class Maybe[T]:
         :param func: A ``Callable`` which takes a type of the possible wrapped value (``T``) and can return any type
             (``U``).
         """
-        return func(self.val) if self.val is not None else None
+        return func(self._val) if self._val is not None else None
 
     def unwrap(self,
             exc: str | Exception | Callable[[], Never] | None = None,
@@ -206,7 +202,7 @@ class Maybe[T]:
             with it as the sole argument. If an ``Exception`` object is given, it is raised, and if a ``Callable`` is
             given, it is called with no arguments.
         """
-        if self.val is None:
+        if self._val is None:
             if isinstance(exc, str):
                 raise ValueError(exc)
             if isinstance(exc, Exception):
@@ -214,15 +210,22 @@ class Maybe[T]:
             if isinstance(exc, Callable):
                 exc()
             raise ValueError('unwrapped Nothing')
-        return self.val
+        return self._val
 
     def unwrap_or(self, other: T) -> T:
         """Returns the wrapped value of a ``Some``, otherwise returns ``other``."""
-        return self.val if self.val is not None else other
+        return self._val if self._val is not None else other
+
+    def zip[U](self, other: Maybe[U]) -> Maybe[tuple[T, U]]:
+        """
+        Returns a wrapped tuple of this and another ``Maybe`` instance's wrapped values if both are ``Some``, otherwise
+        returns ``Nothing``.
+        """
+        return Some((self._val, other._val)) if (self._val is not None) and (other._val is not None) else Nothing
 
 class Some[T](Maybe[T]):
     def __init__(self, val: T) -> None:
-        self.val: T = val
+        self._val: T = val
 
     def __bool__(self) -> bool:
         return True
@@ -232,7 +235,7 @@ class NothingType(Maybe):
 
     def __init__(self, _: None = None) -> None:
         """The ``val`` attribute of a ``NothingType`` is always ``None``, so any parameter given is unused."""
-        self.val = None
+        self._val = None
 
     def __repr__(self) -> str:
         return 'Nothing'

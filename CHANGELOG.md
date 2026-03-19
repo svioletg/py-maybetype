@@ -20,6 +20,7 @@ Generally, more significant breaking changes will be put near the top of each ca
 
 ### Changed
 
+- Renamed attribute `Maybe.val` to `Maybe._val`, should now be treated as a private attribute
 - Method `Maybe.and_then` parameter ``func`` now must return ``Maybe``, making it more like
   [`Option::and_then`](https://doc.rust-lang.org/std/option/enum.Option.html#method.and_then)
 - Method `Maybe.map` is no longer a static method and is now more in line with
@@ -27,6 +28,7 @@ Generally, more significant breaking changes will be put near the top of each ca
   functionality
   - The previous behavior of `Maybe.map` is largely unnecessary as it would produce the exact same
     result as calling `Maybe.cat` with a regular `map()` object
+- Method `Maybe.attr` now optionally takes a `default` parameter
 - Renamed class `_Nothing` to `NothingType`
   - The class was marked as private to encourage use of the `Nothing` singleton instead, but since
     one could want to use the class for type annotations, and the singleton can't be used for
@@ -38,6 +40,11 @@ Generally, more significant breaking changes will be put near the top of each ca
   - `test_maybe_map` rewritten to test for its new functionality
   - `test_maybe_then` rewritten to be less verbose
   - Renamed `test_maybe_with_predicate_and_test` to `test_maybe_with_predicate_and_filter`
+
+### Removed
+
+- Removed method `Maybe.attr_or`
+- Removed parameter `err` from method `Maybe.attr`
 
 ## [0.9.0] - 2026-03-15
 

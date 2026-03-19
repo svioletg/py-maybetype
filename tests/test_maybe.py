@@ -48,7 +48,7 @@ def test_equality() -> None:
     ],
 )
 def test_nothing_instance_always_wraps_none(val: object) -> None:
-    assert NothingType(val).val is None  # ty:ignore[invalid-argument-type]
+    assert NothingType(val)._val is None  # ty:ignore[invalid-argument-type]  # noqa: SLF001
 
 def test_maybe_or() -> None:
     assert (Maybe.try_int('10') or Some(0)).unwrap() == 10  # noqa: PLR2004
@@ -97,33 +97,32 @@ def test_maybe_attr() -> None:
 
     @dataclass
     class B(A):
-        y: float
+        y: str
 
-    m_none: Maybe[A] = maybe(None)
-    assert m_none.attr('x').val is None
-    assert m_none.attr_or('x', 2) == 2  # noqa: PLR2004
+    m_a: Maybe[A] = Some(A(1))
+    m_b: Maybe[B] = Some(B(1, 'one'))
+    m_none: Maybe[A] = Nothing
 
-    m_a: Maybe[A] = maybe(A(1))
     assert m_a.attr('x').unwrap() == 1
-    assert m_a.attr_or('x', 2) == 1
-    assert m_a.attr('y').val is None
-    assert m_a.attr_or('y', 2) == 2  # noqa: PLR2004
-
-    m_b: Maybe[B] = maybe(B(1, 2.0))
+    assert m_a.attr('x', 2).unwrap() == 1
     assert m_b.attr('x').unwrap() == 1
-    assert m_b.attr_or('x', 2) == 1
-    assert m_b.attr('y').unwrap() == 2.0  # noqa: PLR2004
-    assert m_b.attr_or('y', 3) == 2.0  # noqa: PLR2004
+    assert m_b.attr('x', 2).unwrap() == 1
+    assert m_b.attr('y').unwrap() == 'one'
+    assert m_b.attr('y', 'two').unwrap() == 'one'
+    assert m_a.attr('y') is Nothing
+    assert m_a.attr('y', 2).unwrap() == 2  # noqa: PLR2004
+    assert m_none.attr('x') is Nothing
+    assert m_none.attr('x', 2).unwrap() == 2  # noqa: PLR2004
 
 @pytest.mark.parametrize(('val', 'accessor', 'result'),
     [
-        (None,             1,   maybe(None)),
-        ([1, 2, 3],        1,   maybe(2)),
-        ([1, 2, 3],        3,   maybe(None)),
-        ([],               1,   maybe(None)),
-        ({'a': 1, 'b': 2}, 'a', maybe(1)),
-        ({'a': 1, 'b': 2}, 'c', maybe(None)),
-        ({},               'a', maybe(None)),
+        (None,             1,   Nothing),
+        ([1, 2, 3],        1,   Some(2)),
+        ([1, 2, 3],        3,   Nothing),
+        ([],               1,   Nothing),
+        ({'a': 1, 'b': 2}, 'a', Some(1)),
+        ({'a': 1, 'b': 2}, 'c', Nothing),
+        ({},               'a', Nothing),
     ],
     ids=[
         'none',
@@ -249,3 +248,9 @@ def test_maybe_replace[T](m: Maybe[T], new_val: T, expected: Maybe[T]) -> None:
     if m:
         # Assert that a reference to the same instance was returned and not a new instance
         assert id(m) == m_id
+
+def test_maybe_zip[T]() -> None:
+    assert Some(1).zip(Some(2)) == Some((1, 2))
+    assert Some(1).zip(Nothing) is Nothing
+    assert Nothing.zip(Some(2)) is Nothing
+    assert Nothing.zip(Nothing) is Nothing
