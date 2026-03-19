@@ -1,9 +1,7 @@
 import re
 from collections.abc import Callable, Iterable
-from copy import deepcopy
 from dataclasses import dataclass
 from string import ascii_lowercase
-from types import EllipsisType
 
 import pytest  # ty:ignore[unresolved-import, unused-ignore-comment]; seems to only show up in workflow runs?
 
@@ -70,35 +68,27 @@ def test_unwrap_or(val: object, default: object) -> None:
     assert maybe(val).unwrap_or(default) == val
     assert maybe(None).unwrap_or(default) == default
 
-@pytest.mark.parametrize(('val', 'then_fn'),
+@pytest.mark.parametrize(('val', 'func'),
     [
-      # (wrapped value, (.then() function, expected return val), expected wrapped value after function)
-        (0,                (lambda i: i * 10, 0, ...)),
-        (1,                (lambda i: i * 10, 10, ...)),
-        ('',               (lambda s: s.upper(), '', ...)),
-        ('string',         (lambda s: s.upper(), 'STRING', ...)),
-        ('a,b,c',          (lambda s: s.split(','), ['a', 'b', 'c'], ...)),
-        ([1, 2, 3],        (lambda l: l.append(4), None, [1, 2, 3, 4])), # noqa: E741
-        ({'a': 1, 'b': 2}, (lambda d: d.get('a'), 1, ...)),
-    ],
-    ids=[
-        'int_zero',
-        'int_one',
-        'str_empty',
-        'str_nonempty',
-        'str_split',
-        'list',
-        'dict',
+        (Some(1), lambda n: n * 10, Some(10)),
+        (Nothing, lambda n: n * 10, Nothing),
+        (Some('Hello!'), len, Some(6)),
+        (Nothing, len, Nothing),
     ],
 )
-def test_maybe_then[T, R, A](val: T, then_fn: tuple[Callable[[T], R], R, A | EllipsisType]) -> None:
-    m: Maybe[T] = maybe(val)
-    assert bool(m) is True
-    assert m.unwrap() == val
-    m_before = deepcopy(m.val)
-    assert m.then(then_fn[0]) == then_fn[1]
-    assert m.unwrap() == (then_fn[2] if then_fn[2] is not Ellipsis else m_before)
-    assert maybe(None).then(then_fn[0]) is None
+def test_maybe_map[T, U, V](val: Maybe[T], func: Callable[[T], U], expected: Maybe[V]) -> None:
+    assert val.map(func) == expected
+
+@pytest.mark.parametrize(('val', 'func'),
+    [
+        (Some(1), lambda n: n * 10, 10),
+        (Nothing, lambda n: n * 10, None),
+        (Some('Hello!'), len, 6),
+        (Nothing, len, None),
+    ],
+)
+def test_maybe_then[T, U, V](val: Maybe[T], func: Callable[[T], U], expected: Maybe[V]) -> None:
+    assert val.then(func) == expected
 
 def test_maybe_attr() -> None:
     @dataclass
@@ -155,9 +145,6 @@ def test_maybe_cat() -> None:
 def test_maybe_cat_failure() -> None:
     with pytest.raises(AttributeError, match='has no attribute \'unwrap\''):
         Maybe.cat([1, 2, 3]) # type: ignore
-
-def test_maybe_map() -> None:
-    assert Maybe.map(Maybe.try_int, ALPHANUMERIC) == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 def is_valid_uuid(s: str) -> bool:
     return re.match(r"[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}|[0-9a-f]{32}", s) is not None

@@ -49,11 +49,6 @@ class Maybe[T]:
         return [i.unwrap() for i in vals if i]
 
     @staticmethod
-    def map[A, B](fn: Callable[[A], Maybe[B]], vals: Iterable[A]) -> list[B]:
-        """Maps ``fn`` onto ``vals``, taking the unwrapped values of ``Some``s and discarding ``Nothing``s."""
-        return [i.unwrap() for i in map(fn, vals) if i]
-
-    @staticmethod
     def sequence(vals: Iterable[Maybe[T]]) -> Maybe[list[T]]:
         """
         Returns ``Nothing`` if any of ``vals`` is ``Nothing``, otherwise returns a ``Some`` of a list of unwrapped
@@ -147,6 +142,13 @@ class Maybe[T]:
                     raise
         return maybe(default)
 
+    def map[U](self, func: Callable[[T], U]) -> Maybe[U]:
+        """
+        Returns a new ``Maybe`` with the result of calling ``func`` with the wrapped value of this instance, or returns
+        ``Nothing`` if this instance is ``Nothing``.
+        """
+        return Some(func(self.val)) if self.val is not None else Nothing
+
     def reduce[U, R](self, other: Maybe[U], func: Callable[[T, U], R]) -> Self | Maybe[U] | Maybe[R]:
         """
         Reduces the values of two ``Maybe`` instances to one value returned in a new ``Maybe`` using ``func``.
@@ -215,7 +217,7 @@ class Maybe[T]:
 
 class Some[T](Maybe[T]):
     def __init__(self, val: T) -> None:
-        self.val = val
+        self.val: T = val
 
     def __bool__(self) -> bool:
         return True
@@ -224,6 +226,7 @@ class NothingType(Maybe):
     __match_args__ = ()
 
     def __init__(self, _: None = None) -> None:
+        """The ``val`` attribute of a ``NothingType`` is always ``None``, so any parameter given is unused."""
         self.val = None
 
     def __repr__(self) -> str:
@@ -240,8 +243,8 @@ def maybe[T](val: T | None, predicate: Callable[[T], bool] = lambda v: v is not 
     otherwise returns the ``Nothing`` singleton.
 
     :param val: A value to wrap.
-    :param predicate: An optional function that takes ``val`` and, if it returns ``False``, discards ``val``
-        and returns a ``Nothing`` instance. Regardless of the predicate, ``Nothing`` is always returned if
-        ``val`` is ``None``.
+    :param predicate: An function that takes ``val`` and, if it returns ``False``, discards ``val`` and returns a
+    ``Nothing`` instance, by default simply checking if ``val`` is not ``None``. Regardless of the predicate,
+    ``Nothing`` is always returned when ``val`` is ``None``.
     """
     return Nothing if (val is None) or not predicate(val) else Some(val)
