@@ -195,16 +195,14 @@ def test_pattern_matching[T](value: T, predicate: Callable[[T], bool], expected:
 
     assert result == expected
 
-@pytest.mark.parametrize(('value', 'fn', 'expected'),
+@pytest.mark.parametrize(('value', 'func', 'expected'),
     [
-        (None, square, Nothing),
-        (0, square, Some(0)),
-        (5, square, Some(25)),
-        ('image.png', lambda s: s.split('.')[0], Some('image')),
+        (Some('1'), Maybe.try_int, Some(1)),
+        (Nothing, Maybe.try_int, Nothing),
     ],
 )
-def test_maybe_and_then[T, U](value: T, fn: Callable[[T], U], expected: Maybe[T]) -> None:
-    assert maybe(value).and_then(fn) == expected
+def test_maybe_and_then[T, U](value: Maybe[T], func: Callable[[T], Maybe[U]], expected: Maybe[U]) -> None:
+    assert value.and_then(func) == expected
 
 @pytest.mark.parametrize(('vals', 'expected'),
     [

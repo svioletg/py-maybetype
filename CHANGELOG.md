@@ -17,8 +17,10 @@ Generally, more significant breaking changes will be put near the top of each ca
 
 ### Changed
 
+- Method `Maybe.and_then` parameter ``func`` now must return ``Maybe``, making it more like
+  [`Option::and_then`](https://doc.rust-lang.org/std/option/enum.Option.html#method.and_then)
 - Method `Maybe.map` is no longer a static method and is now more in line with
-  [`Option::map`](https://doc.rust-lang.org/std/option/enum.Option.html#method.reduce) in
+  [`Option::map`](https://doc.rust-lang.org/std/option/enum.Option.html#method.map) in
   functionality
   - The previous behavior of `Maybe.map` is largely unnecessary as it would produce the exact same
     result as calling `Maybe.cat` with a regular `map()` object
@@ -26,8 +28,10 @@ Generally, more significant breaking changes will be put near the top of each ca
   - The class was marked as private to encourage use of the `Nothing` singleton instead, but since
     one could want to use the class for type annotations, and the singleton can't be used for
     annotations, it was renamed to both make it no longer private and clarify that it is the type
-- Tests `test_maybe.test_maybe_map` and `test_maybe.test_maybe_then` rewritten
-  - `test_maybe_map` rewritten for its new functionality, `test_maybe_then` rewritten to be less verbose
+- A number of tests rewritten or updated:
+  - `test_maybe.test_maybe_and_then` rewritten to test for its new functionality
+  - `test_maybe.test_maybe_map` rewritten to test for its new functionality
+  - `test_maybe.test_maybe_then` rewritten to be less verbose
 
 ## [0.9.0] - 2026-03-15
 

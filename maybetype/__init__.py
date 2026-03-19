@@ -76,12 +76,12 @@ class Maybe[T]:
         except ValueError:
             return Nothing
 
-    def and_then[U](self, func: Callable[[T], U]) -> Maybe[U]:
+    def and_then[U](self, func: Callable[[T], Maybe[U]]) -> Maybe[U]:
         """
-        Like :py:meth:`~maybetype.Maybe.then`, but returns a ``Maybe`` instance instead—``Nothing`` if this instance
-        is a ``Nothing``, ``Some(U)`` if the instance is ``Some``, where ``U`` is the returned value of ``func``.
+        Returns the result of ``func`` (which must return a ``Maybe``) called with this instance's wrapped value if
+        ``Some``, otherwise returns ``Nothing``.
         """
-        return Some(func(self.val)) if self.val is not None else Nothing
+        return func(self.val) if self.val is not None else Nothing
 
     def attr[U](self, name: str, typ: type[U] | None = None, *, err: bool = False) -> Maybe[U]:
         """
@@ -144,8 +144,8 @@ class Maybe[T]:
 
     def map[U](self, func: Callable[[T], U]) -> Maybe[U]:
         """
-        Returns a new ``Maybe`` with the result of calling ``func`` with the wrapped value of this instance, or returns
-        ``Nothing`` if this instance is ``Nothing``.
+        Returns a new ``Maybe`` with the result of calling ``func`` with the wrapped value of this instance if
+        ``Some``, otherwise returns ``Nothing``.
         """
         return Some(func(self.val)) if self.val is not None else Nothing
 
