@@ -31,10 +31,13 @@ Generally, more significant breaking changes will be put near the top of each ca
   - The class was marked as private to encourage use of the `Nothing` singleton instead, but since
     one could want to use the class for type annotations, and the singleton can't be used for
     annotations, it was renamed to both make it no longer private and clarify that it is the type
-- A number of tests rewritten or updated:
-  - `test_maybe.test_maybe_and_then` rewritten to test for its new functionality
-  - `test_maybe.test_maybe_map` rewritten to test for its new functionality
-  - `test_maybe.test_maybe_then` rewritten to be less verbose
+- Renamed method `Maybe.test` to `Maybe.filter`
+  - The docstring for `Maybe.filter` has also been rewritten a bit to be more concise
+- A number of tests changed in `test_maybe`:
+  - `test_maybe_and_then` rewritten to test for its new functionality
+  - `test_maybe_map` rewritten to test for its new functionality
+  - `test_maybe_then` rewritten to be less verbose
+  - Renamed `test_maybe_with_predicate_and_test` to `test_maybe_with_predicate_and_filter`
 
 ## [0.9.0] - 2026-03-15
 

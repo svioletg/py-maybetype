@@ -114,6 +114,17 @@ class Maybe[T]:
             return Nothing
         return func(self.val)
 
+    def filter(self, predicate: Callable[[T], bool]) -> Maybe[T]:
+        """
+        Returns ``self`` if ``Some`` and ``predicate`` called with this instance's wrapped value returns ``True``,
+        otherwise returns ``Nothing``.
+
+        >>> assert Some(1).filter(lambda n: n > 0).unwrap() == 1
+        >>> assert Some(1).filter(lambda n: n > 1) is Nothing
+        >>> assert Nothing.filter(lambda n: n > 1) is Nothing
+        """
+        return self if (self.val is not None) and predicate(self.val) else Nothing
+
     def get[U](self,
             accessor: Any,  # noqa: ANN401
             typ: type[U] | None = None,
@@ -174,22 +185,6 @@ class Maybe[T]:
             return Nothing
         self.val = new_val
         return self
-
-    def test(self, predicate: Callable[[T], bool]) -> Maybe[T]:
-        """
-        Returns ``Nothing`` if the wrapped value does not return ``True`` when passed to ``predicate``, otherwise
-        returns the instance the method was called from. When called from a ``Nothing`` instance, ``Nothing`` is always
-        returned.
-
-        >>> assert Some(1).test(lambda n: n > 0).unwrap() == 1
-        >>> assert Some(1).test(lambda n: n > 1) is Nothing
-        >>> assert Nothing.test(lambda n: n > 1) is Nothing
-        """
-        match self:
-            case Some(val):
-                return self if predicate(val) else Nothing
-            case _:
-                return Nothing
 
     def then[U](self, func: Callable[[T], U]) -> U | None:
         """
