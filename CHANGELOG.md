@@ -13,7 +13,10 @@ Generally, more significant breaking changes will be put near the top of each ca
 
 - Added method `Maybe.reduce`
   - Replicates Rust's [`Option::reduce`](https://doc.rust-lang.org/std/option/enum.Option.html#method.reduce)
+- Added method `Maybe.replace`
+  - Replicates Rust's [`Option::replace`](https://doc.rust-lang.org/std/option/enum.Option.html#method.replace)
 - Added test `test_maybe.test_reduce`
+- Added test `test_maybe.test_replace`
 
 ### Changed
 

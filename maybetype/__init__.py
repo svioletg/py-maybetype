@@ -165,6 +165,16 @@ class Maybe[T]:
             return Some(func(self.unwrap(), other.unwrap()))
         return self or other
 
+    def replace(self, new_val: T) -> Maybe[T]:
+        """
+        Replaces the wrapped value with ``new_val`` and returns a reference to this same instance if ``Some``,
+        otherwise returns ``Nothing``.
+        """
+        if not self:
+            return Nothing
+        self.val = new_val
+        return self
+
     def test(self, predicate: Callable[[T], bool]) -> Maybe[T]:
         """
         Returns ``Nothing`` if the wrapped value does not return ``True`` when passed to ``predicate``, otherwise

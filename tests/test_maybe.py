@@ -68,7 +68,7 @@ def test_unwrap_or(val: object, default: object) -> None:
     assert maybe(val).unwrap_or(default) == val
     assert maybe(None).unwrap_or(default) == default
 
-@pytest.mark.parametrize(('val', 'func'),
+@pytest.mark.parametrize(('val', 'func', 'expected'),
     [
         (Some(1), lambda n: n * 10, Some(10)),
         (Nothing, lambda n: n * 10, Nothing),
@@ -79,7 +79,7 @@ def test_unwrap_or(val: object, default: object) -> None:
 def test_maybe_map[T, U, V](val: Maybe[T], func: Callable[[T], U], expected: Maybe[V]) -> None:
     assert val.map(func) == expected
 
-@pytest.mark.parametrize(('val', 'func'),
+@pytest.mark.parametrize(('val', 'func', 'expected'),
     [
         (Some(1), lambda n: n * 10, 10),
         (Nothing, lambda n: n * 10, None),
@@ -234,3 +234,17 @@ def test_bind[T, U](m: Maybe[T], func: Callable[[T], Maybe[U]], expected: Maybe[
 )
 def test_reduce[T, U, R](m_a: Maybe[T], m_b: Maybe[U], func: Callable[[T, U], R], expected: Maybe) -> None:
     assert m_a.reduce(m_b, func) == expected
+
+@pytest.mark.parametrize(('m', 'new_val', 'expected'),
+    [
+        (Some(1), 2, Some(2)),
+        (Nothing, 2, Nothing),
+    ],
+)
+def test_maybe_replace[T](m: Maybe[T], new_val: T, expected: Maybe[T]) -> None:
+    m_id = id(m)
+    m = m.replace(new_val)
+    assert m == expected
+    if m:
+        # Assert that a reference to the same instance was returned and not a new instance
+        assert id(m) == m_id
