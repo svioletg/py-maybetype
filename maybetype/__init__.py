@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Callable, Iterable
-from typing import Any, Never, Self
+from typing import Any, Never, cast
 
 
 class Maybe[T]:
@@ -110,6 +110,10 @@ class Maybe[T]:
             return Nothing
         return func(self._val)
 
+    def cast[U](self, typ: type[U]) -> Maybe[U]:
+        """Returns a reference to this instance after casting its type as ``Maybe[typ]``."""
+        return cast(Maybe[U], self)
+
     def filter(self, predicate: Callable[[T], bool]) -> Maybe[T]:
         """
         Returns ``self`` if ``Some`` and ``predicate`` called with this instance's wrapped value returns ``True``,
@@ -120,6 +124,22 @@ class Maybe[T]:
         >>> assert Nothing.filter(lambda n: n > 1) is Nothing
         """
         return self if (self._val is not None) and predicate(self._val) else Nothing
+
+    def flatten(self) -> Maybe[T]:
+        """
+        Converts ``Maybe[Maybe[T]]`` to ``Maybe[T]``. Only flattens one level at a time, and will raise a ``TypeError``
+        if called when the wrapped value is not ``Maybe``.
+
+        .. note::
+            It's expected that the resulting type of this method may not be correctly inferred and will return
+            returning ``Maybe[Unknown]``. For now, :py:meth:`cast` can be used to specify a type for type checkers.
+
+        :raises TypeError:
+            The wrapped value is not ``Maybe``.
+        """
+        if not isinstance(self._val, Maybe):
+            raise TypeError(f'Cannot flatten when wrapped value is not of type Maybe: {self!r}')
+        return maybe(cast(T, self._val._val))  # noqa: SLF001
 
     def get[U](self,
             accessor: Any,  # noqa: ANN401
@@ -156,7 +176,12 @@ class Maybe[T]:
         """
         return Some(func(self._val)) if self._val is not None else Nothing
 
-    def reduce[U, R](self, other: Maybe[U], func: Callable[[T, U], R]) -> Self | Maybe[U] | Maybe[R]:
+    def reduce[U, R](self,
+            other: Maybe[U],
+            func: Callable[[T, U], R],
+            *,
+            strict: bool = False,
+        ) -> Maybe[T] | Maybe[U] | Maybe[R]:
         """
         Reduces the values of two ``Maybe`` instances to one value returned in a new ``Maybe`` using ``func``.
 
@@ -167,10 +192,12 @@ class Maybe[T]:
         >>> assert Some(1).reduce(Nothing, lambda a, b: a + b) == Some(1)
         >>> assert Nothing.reduce(Some(2), lambda a, b: a + b) == Some(2)
         >>> assert Nothing.reduce(Nothing, lambda a, b: a + b) is Nothing
+
+        :param strict: If ``True``, returns ``Nothing`` if ``self`` and ``other`` are not both ``Some``.
         """
         if self and other:
             return Some(func(self.unwrap(), other.unwrap()))
-        return self or other
+        return Nothing if strict else (self or other)
 
     def replace(self, new_val: T) -> Maybe[T]:
         """
@@ -223,7 +250,7 @@ class Maybe[T]:
         """
         return Some((self._val, other._val)) if (self._val is not None) and (other._val is not None) else Nothing
 
-class Some[T](Maybe[T]):
+class Some[T](Maybe):
     def __init__(self, val: T) -> None:
         self._val: T = val
 
@@ -235,7 +262,7 @@ class NothingType(Maybe):
 
     def __init__(self, _: None = None) -> None:
         """The ``val`` attribute of a ``NothingType`` is always ``None``, so any parameter given is unused."""
-        self._val = None
+        self._val: None = None
 
     def __repr__(self) -> str:
         return 'Nothing'

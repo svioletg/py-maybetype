@@ -11,12 +11,21 @@ Generally, more significant breaking changes will be put near the top of each ca
 
 ### Added
 
+- Added method `Maybe.cast`
+  - Casts the type of the wrapped value: `maybe(...).cast(int)` → `maybe[int]`
+- Added method `Maybe.flatten`
+  - Replicates Rust's [`Option::flatten`](https://doc.rust-lang.org/std/option/enum.Option.html#method.flatten)
 - Added method `Maybe.reduce`
   - Replicates Rust's [`Option::reduce`](https://doc.rust-lang.org/std/option/enum.Option.html#method.reduce)
 - Added method `Maybe.replace`
   - Replicates Rust's [`Option::replace`](https://doc.rust-lang.org/std/option/enum.Option.html#method.replace)
+- Added method `Maybe.zip`
+  - Replicates Rust's [`Option::zip`](https://doc.rust-lang.org/std/option/enum.Option.html#method.zip)
+- Added test `test_maybe.test_cast`
+- Added test `test_maybe.test_flatten`
 - Added test `test_maybe.test_reduce`
 - Added test `test_maybe.test_replace`
+- Added test `test_maybe.test_zip`
 
 ### Changed
 

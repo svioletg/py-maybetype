@@ -10,9 +10,6 @@ from maybetype import Maybe, Nothing, NothingType, Some, maybe
 ALPHANUMERIC: str = ascii_lowercase + '0123456789'
 MAYBE_UNWRAP_NONE_REGEX: re.Pattern[str] = re.compile(r"unwrapped Nothing")
 
-def square(n: int) -> int:
-    return n * n
-
 def test_unwrap_nothing() -> None:
     assert bool(Nothing) is False
     with pytest.raises(ValueError, match=MAYBE_UNWRAP_NONE_REGEX):
@@ -224,16 +221,23 @@ def test_maybe_sequence[T](vals: Iterable[Maybe[T]], expected: Maybe[list[T]]) -
 def test_bind[T, U](m: Maybe[T], func: Callable[[T], Maybe[U]], expected: Maybe[U]) -> None:
     assert m.bind(func) == expected
 
+@dataclass
+class Point:
+    x: int
+    y: int
+
 @pytest.mark.parametrize(('m_a', 'm_b', 'func', 'expected'),
     [
         (Some(1), Some(2), lambda a, b: a + b, Some(3)),
-        (Some(1), Nothing, lambda a, b: a + b, Some(1)),
-        (Nothing, Some(2), lambda a, b: a + b, Some(2)),
-        (Nothing, Nothing, lambda a, b: a + b, Nothing),
+        (Some([1, 2]), Some([3, 4]), lambda a, b: a + b, Some([1, 2, 3, 4])),
+        (Some(1), Some(2), Point, Some(Point(1, 2))),
     ],
 )
-def test_reduce[T, U, R](m_a: Maybe[T], m_b: Maybe[U], func: Callable[[T, U], R], expected: Maybe) -> None:
+def test_reduce[T, U, R](m_a: Some[T], m_b: Some[U], func: Callable[[T, U], R], expected: Maybe) -> None:
     assert m_a.reduce(m_b, func) == expected
+    assert m_a.reduce(Nothing, func) == m_a
+    assert Nothing.reduce(m_b, func) == m_b
+    assert Nothing.reduce(Nothing, func) is Nothing
 
 @pytest.mark.parametrize(('m', 'new_val', 'expected'),
     [
@@ -249,8 +253,20 @@ def test_maybe_replace[T](m: Maybe[T], new_val: T, expected: Maybe[T]) -> None:
         # Assert that a reference to the same instance was returned and not a new instance
         assert id(m) == m_id
 
-def test_maybe_zip[T]() -> None:
+def test_maybe_zip() -> None:
     assert Some(1).zip(Some(2)) == Some((1, 2))
     assert Some(1).zip(Nothing) is Nothing
     assert Nothing.zip(Some(2)) is Nothing
     assert Nothing.zip(Nothing) is Nothing
+
+def test_maybe_flatten() -> None:
+    assert Some(Some(1)).flatten() == Some(1)
+    assert Some(Nothing).flatten() is Nothing
+
+    with pytest.raises(TypeError, match=r"Cannot flatten.*"):
+        Some(1).flatten()
+
+def test_maybe_cast() -> None:
+    m = Some(1)
+    m_id = id(m)
+    assert id(m.cast(int)) == m_id
