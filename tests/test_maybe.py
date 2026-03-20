@@ -288,3 +288,13 @@ def test_maybe_unwrap_or_else() -> None:
 
     assert s.unwrap_or_else(f) == 1
     assert Nothing.unwrap_or_else(f) == 2  # noqa: PLR2004
+
+def test_maybe_unzip() -> None:
+    assert Some((1, 2)).unzip() == (Some(1), Some(2))
+    assert Nothing.unzip() == (Nothing, Nothing)
+
+    with pytest.raises(TypeError, match=r"Cannot unzip"):
+        assert Some((1, 2, 3)).unzip()
+
+    with pytest.raises(TypeError, match=r"Cannot unzip"):
+        assert Some(1).unzip() == (Nothing, Nothing)

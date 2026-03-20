@@ -250,6 +250,20 @@ class Maybe[T]:
         """Returns the wrapped value if ``Some``, otherwise returns the result of calling ``func``."""
         return self._val if self._val is not None else func()
 
+    def unzip[U](self) -> tuple[Maybe[T], Maybe[U]]:
+        """
+        Returns ``(Some(a), Some(b))`` if the wrapped value is a tuple of two items. If ``Nothing``,
+        ``(Nothing, Nothing)`` is returned. Otherwise, ``TypeError`` is raised.
+
+        :raises TypeError:
+            The wrapped value is not a 2-tuple.
+        """
+        if isinstance(self._val, tuple) and (len(self._val) == 2):  # noqa: PLR2004
+            return (Some(self._val[0]), Some(self._val[1]))
+        if self._val is None:
+            return (Nothing, Nothing)
+        raise TypeError(f'Cannot unzip Maybe if the wrapped value is not a 2-tuple: {self!r}')
+
     def zip[U](self, other: Maybe[U]) -> Maybe[tuple[T, U]]:
         """
         Returns a wrapped tuple of this and another ``Maybe`` instance's wrapped values if both are ``Some``, otherwise

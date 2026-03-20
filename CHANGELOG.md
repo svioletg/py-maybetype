@@ -23,6 +23,8 @@ Generally, more significant breaking changes will be put near the top of each ca
   - Replicates Rust's [`Option::replace`](https://doc.rust-lang.org/std/option/enum.Option.html#method.replace)
 - Added method `Maybe.unwrap_or_else`
   - Replicates Rust's [`Option::unwrap_or_else`](https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap_or_else)
+- Added method `Maybe.unzip`
+  - Replicates Rust's [`Option::unzip`](https://doc.rust-lang.org/std/option/enum.Option.html#method.unzip)
 - Added method `Maybe.zip`
   - Replicates Rust's [`Option::zip`](https://doc.rust-lang.org/std/option/enum.Option.html#method.zip)
 - Added test `test_maybe.test_maybe_cast`
@@ -31,6 +33,7 @@ Generally, more significant breaking changes will be put near the top of each ca
 - Added test `test_maybe.test_maybe_reduce`
 - Added test `test_maybe.test_maybe_replace`
 - Added test `test_maybe.test_maybe_unwrap_or_else`
+- Added test `test_maybe.test_maybe_unzip`
 - Added test `test_maybe.test_maybe_zip`
 
 ### Changed
