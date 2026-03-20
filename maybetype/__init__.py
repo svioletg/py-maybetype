@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Callable, Iterable
-from typing import Any, Never, cast
+from typing import Any, Never, Self, cast
 
 
 class Maybe[T]:
@@ -168,6 +168,12 @@ class Maybe[T]:
                 if err:
                     raise
         return maybe(default)
+
+    def inspect(self, func: Callable[[T], Any]) -> Self:
+        """Calls a functioned with the wrapped value if ``Some``, otherwise does nothing. Returns this instance."""
+        if self._val is not None:
+            func(self._val)
+        return self
 
     def map[U](self, func: Callable[[T], U]) -> Maybe[U]:
         """

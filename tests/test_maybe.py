@@ -270,3 +270,12 @@ def test_maybe_cast() -> None:
     m = Some(1)
     m_id = id(m)
     assert id(m.cast(int)) == m_id
+
+def test_maybe_inspect() -> None:
+    lst = [1, 2, 3]
+    m = Some(4)
+    m_id = id(m)
+    assert id(m.inspect(lst.append)) == m_id
+    assert lst == [1, 2, 3, 4]
+    Nothing.inspect(lst.append)
+    assert lst == [1, 2, 3, 4]
