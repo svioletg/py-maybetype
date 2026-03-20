@@ -36,5 +36,4 @@ jobs:
         ruff check .
     - name: Test
       run: |
-        python -m doctest maybetype/*.py
-        pytest -v
+        pytest -v --doctest-modules
