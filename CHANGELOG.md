@@ -21,14 +21,17 @@ Generally, more significant breaking changes will be put near the top of each ca
   - Replicates Rust's [`Option::reduce`](https://doc.rust-lang.org/std/option/enum.Option.html#method.reduce)
 - Added method `Maybe.replace`
   - Replicates Rust's [`Option::replace`](https://doc.rust-lang.org/std/option/enum.Option.html#method.replace)
+- Added method `Maybe.unwrap_or_else`
+  - Replicates Rust's [`Option::unwrap_or_else`](https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap_or_else)
 - Added method `Maybe.zip`
   - Replicates Rust's [`Option::zip`](https://doc.rust-lang.org/std/option/enum.Option.html#method.zip)
-- Added test `test_maybe.test_cast`
-- Added test `test_maybe.test_flatten`
-- Added test `test_maybe.test_inspect`
-- Added test `test_maybe.test_reduce`
-- Added test `test_maybe.test_replace`
-- Added test `test_maybe.test_zip`
+- Added test `test_maybe.test_maybe_cast`
+- Added test `test_maybe.test_maybe_flatten`
+- Added test `test_maybe.test_maybe_inspect`
+- Added test `test_maybe.test_maybe_reduce`
+- Added test `test_maybe.test_maybe_replace`
+- Added test `test_maybe.test_maybe_unwrap_or_else`
+- Added test `test_maybe.test_maybe_zip`
 
 ### Changed
 
@@ -41,6 +44,8 @@ Generally, more significant breaking changes will be put near the top of each ca
   - The previous behavior of `Maybe.map` is largely unnecessary as it would produce the exact same
     result as calling `Maybe.cat` with a regular `map()` object
 - Method `Maybe.attr` now optionally takes a `default` parameter
+- Method `Maybe.unwrap` parameter `exc` now defaults to a string instead of `None`, and no longer
+  accepts `None`
 - Renamed class `_Nothing` to `NothingType`
   - The class was marked as private to encourage use of the `Nothing` singleton instead, but since
     one could want to use the class for type annotations, and the singleton can't be used for

@@ -224,16 +224,13 @@ class Maybe[T]:
         """
         return func(self._val) if self._val is not None else None
 
-    def unwrap(self,
-            exc: str | Exception | Callable[[], Never] | None = None,
-        ) -> T:
+    def unwrap(self, exc: str | Exception | Callable[[], Never] = 'unwrapped Nothing') -> T:
         """
-        Returns the wrapped value if this instance is ``Some``, otherwise raises ``ValueError`` by default.
+        Returns the wrapped value if ``Some``, otherwise raises ``ValueError`` or fails according to ``exc``.
 
-        :param exc: The exception to raise when unwrapping ``Nothing``. Can be a string, an ``Exception`` object, or a
-            ``Callable`` which takes no arguments and does not return. If a string is given, ``ValueError`` is raised
-            with it as the sole argument. If an ``Exception`` object is given, it is raised, and if a ``Callable`` is
-            given, it is called with no arguments.
+        :param exc: The exception to raise when unwrapping ``Nothing``. If a string is given, ``ValueError`` is raised
+            as ``ValueError(exc)``. If an ``Exception`` object is given, it is raised. If a ``Callable`` is given, it
+            is called with no arguments.
         """
         if self._val is None:
             if isinstance(exc, str):
@@ -246,8 +243,12 @@ class Maybe[T]:
         return self._val
 
     def unwrap_or(self, other: T) -> T:
-        """Returns the wrapped value of a ``Some``, otherwise returns ``other``."""
+        """Returns the wrapped value if ``Some``, otherwise returns ``other``."""
         return self._val if self._val is not None else other
+
+    def unwrap_or_else(self, func: Callable[[], T]) -> T:
+        """Returns the wrapped value if ``Some``, otherwise returns the result of calling ``func``."""
+        return self._val if self._val is not None else func()
 
     def zip[U](self, other: Maybe[U]) -> Maybe[tuple[T, U]]:
         """

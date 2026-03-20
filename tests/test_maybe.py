@@ -233,7 +233,7 @@ class Point:
         (Some(1), Some(2), Point, Some(Point(1, 2))),
     ],
 )
-def test_reduce[T, U, R](m_a: Some[T], m_b: Some[U], func: Callable[[T, U], R], expected: Maybe) -> None:
+def test_maybe_reduce[T, U, R](m_a: Some[T], m_b: Some[U], func: Callable[[T, U], R], expected: Maybe) -> None:
     assert m_a.reduce(m_b, func) == expected
     assert m_a.reduce(Nothing, func) == m_a
     assert Nothing.reduce(m_b, func) == m_b
@@ -279,3 +279,12 @@ def test_maybe_inspect() -> None:
     assert lst == [1, 2, 3, 4]
     Nothing.inspect(lst.append)
     assert lst == [1, 2, 3, 4]
+
+def test_maybe_unwrap_or_else() -> None:
+    def f() -> int:
+        return 2
+
+    s = Some(1)
+
+    assert s.unwrap_or_else(f) == 1
+    assert Nothing.unwrap_or_else(f) == 2  # noqa: PLR2004
