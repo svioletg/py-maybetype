@@ -298,3 +298,12 @@ def test_maybe_unzip() -> None:
 
     with pytest.raises(TypeError, match=r"Cannot unzip"):
         assert Some(1).unzip() == (Nothing, Nothing)
+
+def test_maybe_xor() -> None:
+    s_a = Some(1)
+    s_b = Some(2)
+
+    assert s_a.xor(s_b) == Nothing
+    assert s_a.xor(Nothing) == s_a
+    assert Nothing.xor(s_b) == s_b
+    assert Nothing.xor(Nothing) == Nothing

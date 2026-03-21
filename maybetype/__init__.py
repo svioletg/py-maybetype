@@ -264,6 +264,10 @@ class Maybe[T]:
             return (Nothing, Nothing)
         raise TypeError(f'Cannot unzip Maybe if the wrapped value is not a 2-tuple: {self!r}')
 
+    def xor(self, other: Maybe[T]) -> Maybe[T]:
+        """Returns ``Some`` if exactly one of ``self`` and ``other`` is ``Some``, otherwise returns ``Nothing``."""
+        return Nothing if self and other else self or other
+
     def zip[U](self, other: Maybe[U]) -> Maybe[tuple[T, U]]:
         """
         Returns a wrapped tuple of this and another ``Maybe`` instance's wrapped values if both are ``Some``, otherwise
