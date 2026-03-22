@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Generally, more significant breaking changes will be put near the top of each category.
 
+## [0.10.1] - 2026-03-22
+
+### Fixed
+
+- Fixed `.gitignore` rule mistakenly excluding `maybetype/__init__.py`, thus rendering the package
+  effectively empty
+
 ## [0.10.0] - 2026-03-21
 
 ### Added
