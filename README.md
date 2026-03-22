@@ -9,6 +9,7 @@ PyPI: <https://pypi.org/project/py-maybetype/>
 > [!WARNING]
 > I'm not considering any version before 1.0 stable, and breaking changes are likely with each 0.x
 > release. Though I'm using it in my own projects, I wouldn't consider it "production-ready" until
+> a 1.0.0 release is made.
 
 A basic implementation of a maybe/option type in Python, largely inspired by Rust's `Option`.
 This was created as part of a separate project I had been working on, but I decided to make it into
