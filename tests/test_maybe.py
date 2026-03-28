@@ -161,6 +161,7 @@ def is_valid_uuid(s: str) -> bool:
 )
 def test_maybe_with_predicate_and_filter[T](value: T, predicate: Callable[[T], bool], expected_bool: bool) -> None:
     assert bool(maybe(value, predicate)) is expected_bool
+    assert maybe(value, predicate) == maybe(value).filter(predicate)
     if expected_bool is False:
         assert maybe(value, predicate) is Nothing
         assert maybe(value).filter(predicate) is Nothing

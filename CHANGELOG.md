@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Generally, more significant breaking changes will be put near the top of each category.
 
+## Unreleased
+
+### Changed
+
+- Changed docstring of function `maybe` to describe the `predicate` parameter more succinctly
+- Updated test `test_maybe.test_maybe_with_predicate_and_filter` to ensure
+  `maybe(val).filter(predicate)` is equivalent to `maybe(val, predicate)`
+
 ## [0.10.1] - 2026-03-22
 
 ### Fixed

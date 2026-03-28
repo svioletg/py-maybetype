@@ -303,8 +303,8 @@ def maybe[T](val: T | None, predicate: Callable[[T], bool] = lambda v: v is not 
     otherwise returns the ``Nothing`` singleton.
 
     :param val: A value to wrap.
-    :param predicate: An function that takes ``val`` and, if it returns ``False``, discards ``val`` and returns a
-    ``Nothing`` instance, by default simply checking if ``val`` is not ``None``. Regardless of the predicate,
-    ``Nothing`` is always returned when ``val`` is ``None``.
+    :param predicate: A function that must return ``True`` for ``predicate(val)`` in addition to ``val`` not being
+        ``None`` in order for a ``Some`` to be returned; ``maybe(val, predicate)`` is then effectively shorthand for
+        ``maybe(val).filter(predicate)``.
     """
     return Nothing if (val is None) or not predicate(val) else Some(val)
