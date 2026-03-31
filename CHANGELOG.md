@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Generally, more significant breaking changes will be put near the top of each category.
 
+Documentation here: <https://py-maybetype.readthedocs.io/en/latest/reference/>
+
 ## [0.10.1] - 2026-03-22
 
 ### Fixed
