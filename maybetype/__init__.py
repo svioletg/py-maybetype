@@ -275,13 +275,6 @@ class Maybe[T]:
         """
         return Some((self._val, other._val)) if (self._val is not None) and (other._val is not None) else Nothing
 
-class Some[T](Maybe):
-    def __init__(self, val: T) -> None:
-        self._val: T = val
-
-    def __bool__(self) -> bool:
-        return True
-
 class NothingType(Maybe):
     __match_args__ = ()
 
@@ -296,6 +289,13 @@ class NothingType(Maybe):
         return False
 
 Nothing = NothingType()
+
+class Some[T](Maybe):
+    def __init__(self, val: T) -> None:
+        self._val: T = val
+
+    def __bool__(self) -> bool:
+        return True
 
 def maybe[T](val: T | None, predicate: Callable[[T], bool] = lambda v: v is not None) -> Maybe[T]:
     """
