@@ -14,8 +14,8 @@ class Maybe[T]:
 
     def __init__(self, val: T | None) -> None:
         warnings.warn(
-            'Direct instancing of Maybe() not intended and may cause unexpected behavior,'
-            + ' use the maybe() function instead',
+            'Direct instancing of Maybe not intended and may cause unexpected behavior,'
+            + ' use the maybe() function, instance Some, or use the Nothing singleton instead',
             stacklevel=2,
         )
         self._val: T | None = val
