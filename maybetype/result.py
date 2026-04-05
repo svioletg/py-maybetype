@@ -75,6 +75,33 @@ class Result[T, E]:
             func(cast(E, self._val))
         return self
 
+    def map[U](self, func: Callable[[T], U]) -> Result[U, E]:
+        """Returns a new ``Result`` with ``func`` mapped onto an ``Ok`` value, leaving an ``Err`` unmodified."""
+        if self:
+            return Ok(func(cast(T, self._val)))
+        return cast(Result[U, E], self)
+
+    def map_err[F](self, func: Callable[[E], F]) -> Result[T, F]:
+        """Returns a new ``Result`` with ``func`` mapped onto an ``Err`` value, leaving an ``Ok`` unmodified."""
+        if not self:
+            return Err(func(cast(E, self._val)))
+        return cast(Result[T, F], self)
+
+    def map_or[U](self, default: U, func: Callable[[T], U]) -> U:
+        """Returns ``func`` mapped onto the wrapped value if ``Ok``, otherwise returns ``default``."""
+        if self:
+            return func(cast(T, self._val))
+        return default
+
+    def map_or_else[U](self, default: Callable[[E], U], func: Callable[[T], U]) -> U:
+        """
+        Returns ``func`` mapped onto the wrapped value if ``Ok``, otherwise applying ``default`` to the ``Err`` value
+        and returning that.
+        """
+        if self:
+            return func(cast(T, self._val))
+        return default(cast(E, self._val))
+
     def ok(self) -> Maybe[E]:
         """Returns a ``Some`` with the wrapped value if ``Ok``, otherwise returns ``Nothing``."""
         if not self:
@@ -122,14 +149,18 @@ class Result[T, E]:
             return cast(E, self._val)
         return self._unwrap_fail(exc)
 
-class Ok[T](Result):
+# TODO: Consider having Ok and Err just be functions that return a Result instance, that may be easier to satisfy type
+#       checkers with? Then maybe the Result class just has an attribute to indicate whether it should be treated as
+#       Ok or Err?
+
+class Ok[T, E](Result[T, E]):
     def __init__(self, val: T) -> None:
         self._val: T = val
 
     def __bool__(self) -> bool:
         return True
 
-class Err[E](Result):
+class Err[T, E](Result[T, E]):
     def __init__(self, val: E) -> None:
         self._val: E = val
 

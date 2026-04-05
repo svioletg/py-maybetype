@@ -56,6 +56,28 @@ def test_inspect() -> None:
     assert ok.inspect(print) is ok
     assert err.inspect(print) is err
 
+def test_map() -> None:
+    ok = Ok(1)
+    err = Err('failure')
+
+    def double(n: int) -> int:
+        return n * 2
+
+    def to_upper(s: str) -> str:
+        return s.upper()
+
+    assert ok.map(double) == Ok(2)
+    assert err.map(double) == Err('failure')
+
+    assert ok.map_err(to_upper) == Ok(1)
+    assert err.map_err(to_upper) == Err('FAILURE')
+
+    assert ok.map_or(0, double) == 2  # noqa: PLR2004
+    assert err.map_or(0, double) == 0
+
+    assert ok.map_or_else(to_upper, double) == 2  # noqa: PLR2004
+    assert err.map_or_else(to_upper, double) == 'FAILURE'
+
 def test_unwrap() -> None:
     def abort(e: object) -> Never:
         raise ValueError(e)
