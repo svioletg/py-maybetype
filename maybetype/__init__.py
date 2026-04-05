@@ -127,8 +127,8 @@ class Maybe[T]:
 
     def flatten(self) -> Maybe[T]:
         """
-        Converts ``Maybe[Maybe[T]]`` to ``Maybe[T]``. Only flattens one level at a time, and will raise a ``TypeError``
-        if called when the wrapped value is not ``Maybe``.
+        Returns a new ``Maybe[T]`` from a ``Maybe[Maybe[T]]``. Only flattens one level at a time, and will raise a
+        ``TypeError`` if called when the wrapped value is not ``Maybe``.
 
         .. note::
             It's expected that the resulting type of this method may not be correctly inferred and will return

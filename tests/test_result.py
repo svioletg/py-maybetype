@@ -34,6 +34,17 @@ def test_to_maybe_err() -> None:
     assert Ok(1).err() is Nothing
     assert Err('failure').err() == Some('failure')
 
+def test_flatten() -> None:
+    ok_nest = Ok(Ok(1))
+    err_nest = Err(Err('failure'))
+    ok_err = Ok(Err('failure'))
+    err_ok = Err(Ok(1))
+
+    assert ok_nest.flatten() == Ok(1)
+    assert err_nest.flatten() == Err('failure')
+    assert ok_err.flatten() == Err('failure')
+    assert err_ok.flatten() == Ok(1)
+
 def test_unwrap() -> None:
     def abort(e: object) -> Never:
         raise ValueError(e)

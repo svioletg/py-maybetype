@@ -36,11 +36,32 @@ class Result[T, E]:
             return func(cast(T, self._val))
         return cast(Result[U, E], self)
 
+    def cast[U, F](self, t_type: type[U], e_type: type[F]) -> Result[U, F]:
+        """Returns a reference to this instance after casting its type as ``Result[t_type, e_type]``."""
+        return cast(Result[U, F], self)
+
     def err(self) -> Maybe[E]:
         """Returns a ``Some`` with the wrapped value if ``Err``, otherwise returns ``Nothing``."""
         if self:
             return Nothing
         return Some(self._val)
+
+    def flatten(self) -> Result[T, E]:
+        """
+        Returns a new ``Result[T, E]`` from a``Result[Result[T, E], E]``. Only flattens one level at a time, and will
+        raise a ``TypeError`` if called when the wrapped value is not ``Result``.
+
+        .. note::
+            It's expected that the resulting type of this method may not be correctly inferred and will return
+            returning ``Result[Unknown, Unknown]``. For now, :py:meth:`cast` can be used to specify a type for type
+            checkers.
+
+        :raises TypeError:
+            The wrapped value is not ``Result``.
+        """
+        if not isinstance(self._val, Result):
+            raise TypeError(f'Cannot flatten when wrapped value is not of type Result: {self!r}')
+        return self._val
 
     def _unwrap_fail(self, exc: str | type[Exception] | Callable[[E], Never]) -> Never:
         if isinstance(exc, str):
