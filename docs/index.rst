@@ -7,7 +7,8 @@ py-maybetype documentation
 
    readme.rst
    changelog.rst
-   reference/index.rst
+   reference/maybetype.rst
+   reference/result.rst
 
 Indices and tables
 ==================

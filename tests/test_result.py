@@ -1,3 +1,5 @@
+from typing import Never
+
 import pytest
 
 from maybetype import Nothing, Some
@@ -33,6 +35,28 @@ def test_to_maybe_err() -> None:
     assert Err('failure').err() == Some('failure')
 
 def test_unwrap() -> None:
-    assert Ok(1).unwrap() == 1
-    with pytest.raises(ResultUnwrapError, match='failure'):
-        Err('failure').unwrap()
+    def abort(e: object) -> Never:
+        raise ValueError(e)
+
+    ok = Ok(1)
+    err = Err('failure')
+
+    assert ok.unwrap() == 1
+    with pytest.raises(ResultUnwrapError, match='\'failure\''):
+        err.unwrap()
+    with pytest.raises(ResultUnwrapError, match='Something went wrong: \'failure\''):
+        err.unwrap('Something went wrong')
+    with pytest.raises(ValueError, match='failure'):
+        err.unwrap(abort)
+    with pytest.raises(ValueError, match='\'failure\''):
+        err.unwrap(ValueError)
+
+    assert err.unwrap_err() == 'failure'
+    with pytest.raises(ResultUnwrapError, match='1'):
+        ok.unwrap_err()
+    with pytest.raises(ResultUnwrapError, match='Something went wrong: 1'):
+        ok.unwrap_err('Something went wrong')
+    with pytest.raises(ValueError, match='1'):
+        ok.unwrap_err(abort)
+    with pytest.raises(ValueError, match='1'):
+        ok.unwrap_err(ValueError)
