@@ -75,6 +75,12 @@ class Result[T, E]:
             func(cast(E, self._val))
         return self
 
+    def ok(self) -> Maybe[E]:
+        """Returns a ``Some`` with the wrapped value if ``Ok``, otherwise returns ``Nothing``."""
+        if not self:
+            return Nothing
+        return Some(self._val)
+
     def _unwrap_fail(self, exc: str | type[Exception] | Callable[[E], Never]) -> Never:
         if isinstance(exc, str):
             raise ResultUnwrapError(f'{exc}: {self._val!r}')

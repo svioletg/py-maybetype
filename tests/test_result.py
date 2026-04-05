@@ -34,6 +34,10 @@ def test_to_maybe_err() -> None:
     assert Ok(1).err() is Nothing
     assert Err('failure').err() == Some('failure')
 
+def test_to_maybe_ok() -> None:
+    assert Ok(1).ok() == Some(1)
+    assert Err('failure').ok() is Nothing
+
 def test_flatten() -> None:
     ok_nest = Ok(Ok(1))
     err_nest = Err(Err('failure'))
