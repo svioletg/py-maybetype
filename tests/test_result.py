@@ -45,6 +45,13 @@ def test_flatten() -> None:
     assert ok_err.flatten() == Err('failure')
     assert err_ok.flatten() == Ok(1)
 
+def test_inspect() -> None:
+    ok = Ok(1)
+    err = Err('failure')
+
+    assert ok.inspect(print) is ok
+    assert err.inspect(print) is err
+
 def test_unwrap() -> None:
     def abort(e: object) -> Never:
         raise ValueError(e)

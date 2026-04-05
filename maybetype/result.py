@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Callable
-from typing import Never, cast
+from typing import Any, Never, Self, cast
 
 from maybetype import Maybe, Nothing, Some
 from maybetype.errors import ResultUnwrapError
@@ -62,6 +62,18 @@ class Result[T, E]:
         if not isinstance(self._val, Result):
             raise TypeError(f'Cannot flatten when wrapped value is not of type Result: {self!r}')
         return self._val
+
+    def inspect(self, func: Callable[[T], Any]) -> Self:
+        """Calls a function with the wrapped value if ``Ok``, otherwise does nothing. Returns this instance."""
+        if self:
+            func(cast(T, self._val))
+        return self
+
+    def inspect_err(self, func: Callable[[E], Any]) -> Self:
+        """Calls a function with the wrapped value if ``Err``, otherwise does nothing. Returns this instance."""
+        if self:
+            func(cast(E, self._val))
+        return self
 
     def _unwrap_fail(self, exc: str | type[Exception] | Callable[[E], Never]) -> Never:
         if isinstance(exc, str):

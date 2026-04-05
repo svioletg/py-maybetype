@@ -11,6 +11,13 @@ Documentation here: <https://py-maybetype.readthedocs.io/en/latest/reference/>
 
 ## Unreleased
 
+### Added
+
+- Added the `result` module
+  - Added classes `Result`, `Ok`, and `Err`
+- Added the `errors` module
+  - Added exception `ResultUnwrapError`
+
 ### Changed
 
 - Changed docstring of function `maybe` to describe the `predicate` parameter more succinctly

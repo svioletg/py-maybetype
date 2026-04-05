@@ -170,7 +170,7 @@ class Maybe[T]:
         return maybe(default)
 
     def inspect(self, func: Callable[[T], Any]) -> Self:
-        """Calls a functioned with the wrapped value if ``Some``, otherwise does nothing. Returns this instance."""
+        """Calls a function with the wrapped value if ``Some``, otherwise does nothing. Returns this instance."""
         if self._val is not None:
             func(self._val)
         return self
