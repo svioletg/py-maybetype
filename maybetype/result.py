@@ -9,6 +9,11 @@ from maybetype.errors import ResultUnwrapError
 
 
 class Result[T, E]:
+    """
+    A class which wraps a value of ``T`` if the instance is of the subclass ``Ok``, or wraps ``E`` if ``Err``.
+    The ``Result`` class itself should only be using for type annotations and not instancing; use the ``Ok`` and ``Err``
+    constructors otherwise.
+    """
     __match_args__ = ('_val',)
 
     def __init__(self, val: T | E) -> None:
@@ -168,6 +173,7 @@ class Result[T, E]:
         return self._unwrap_fail(exc)
 
 class Ok[T, E](Result[T, E]):
+    """Indicates a successful result of type ``T``."""
     def __init__(self, val: T) -> None:
         self._val: T = val
 
@@ -175,6 +181,7 @@ class Ok[T, E](Result[T, E]):
         return True
 
 class Err[T, E](Result[T, E]):
+    """Indicates a failed result of type ``E``."""
     def __init__(self, val: E) -> None:
         self._val: E = val
 
