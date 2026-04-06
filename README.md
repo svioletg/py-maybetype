@@ -11,11 +11,14 @@ PyPI: <https://pypi.org/project/py-maybetype/>
 > release. Though I'm using it in my own projects, I wouldn't consider it "production-ready" until
 > a 1.0.0 release is made.
 
-A basic implementation of a maybe/option type in Python, largely inspired by Rust's `Option`.
+A basic implementation of a maybe/option type in Python, largely inspired by Rust's [`Option`](https://doc.rust-lang.org/std/option/enum.Option.html).
 This was created as part of a separate project I had been working on, but I decided to make it into
 its own package as I wanted to use it elsewhere and its scope grew. This is not meant to be a 1:1
 replication or replacement for Rust's `Option` or Haskell's `Maybe`, but rather an
 interperetation of the idea that I feel works for Python.
+
+This package also implements a [`Result`](https://doc.rust-lang.org/std/result/enum.Result.html)
+type which can be used to wrap either a success (`Ok`) or failure (`Err`) value.
 
 ## Usage
 
@@ -26,7 +29,14 @@ pip install py-maybetype
 ```
 
 Call the `maybe()` function with a `T | None` value to return a `Maybe[T]`—either a `Some` instance
-containing the wrapped value, or the `Nothing` singleton.
+containing the wrapped value, or the `Nothing` singleton. You can also directly use the `Some`
+constructor or the `Nothing` singleton explicitly e.g. when returning a value from a function.
+`Maybe` only serves as a superclass to provide methods for `Some` and `Nothing` and to be used
+for typing, it should not be instanced directly. If it is, a warning is emitted.
+
+`Nothing` is just an instance of the `NothingType` class, and should be used instead of creating
+new `NothingType` instances since all are functionally identical. A warning is emitted if the class
+is instanced more than once.
 
 ```python
 from maybetype import Maybe, maybe
@@ -65,7 +75,7 @@ for which `Some(value)` is returned. This argument must be a `Callable` that ret
 where returning `False` causes the constructor to return `Nothing`.
 
 > [!NOTE]
-> `maybe(None)` will always returning `Nothing`, even if `predicate(None)` would return `True`
+> `maybe(None)` will always return `Nothing`, even if `predicate(None)` would return `True`
 
 ```python
 import re
