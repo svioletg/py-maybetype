@@ -78,6 +78,12 @@ def test_map() -> None:
     assert ok.map_or_else(to_upper, double) == 2  # noqa: PLR2004
     assert err.map_or_else(to_upper, double) == 'FAILURE'
 
+def test_transpose() -> None:
+    assert Ok(Some(1)).transpose() == Some(Ok(1))
+    assert Ok(Nothing).transpose() is Nothing
+    assert Err(Some(1)).transpose() == Some(Err(1))
+    assert Err(Nothing).transpose() == Some(Err(Nothing))
+
 def test_unwrap() -> None:
     def abort(e: object) -> Never:
         raise ValueError(e)
