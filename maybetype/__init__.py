@@ -246,6 +246,27 @@ class Maybe[T]:
         """
         return func(self._val) if self._val is not None else None
 
+    def transpose(self: Maybe[Result]) -> Result[Maybe[Any], Any]:
+        """
+        Transposes a ``Maybe`` of ``Result`` to a ``Result`` of ``Maybe``.
+
+        ``Some(Ok(x))`` becomes ``Ok(Some(x))``, ``Some(Err(x))`` becomes ``Err(x)``, ``Nothing`` becomes
+        ``Ok(Nothing)``.
+
+        .. note::
+            Currently the type information of the wrapped ``Result`` can't be known and used for the return type of
+            this method, so it will return ``Result[Maybe[Any], Any]``. You can use the :py:meth:`cast` method to
+            work around this for now.
+
+        :raises TypeError:
+            The wrapped value is not ``Result``.
+        """
+        if self._val is None:
+            return Ok(Nothing)
+        if not isinstance(self._val, Result):
+            raise TypeError(f'Cannot transpose Some instance which does not wrap Result: {self!r}')
+        return Ok(Some(self._val.unwrap())) if self._val else self._val
+
     def unwrap(self, exc: str | Exception | Callable[[], Never] = 'unwrapped Nothing') -> T:
         """
         Returns the wrapped value if ``Some``, otherwise raises ``ValueError`` or fails according to ``exc``.
