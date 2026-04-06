@@ -2,9 +2,8 @@ from typing import Never
 
 import pytest
 
-from maybetype import Nothing, Some
+from maybetype import Err, Nothing, Ok, Result, Some
 from maybetype.errors import ResultUnwrapError
-from maybetype.result import Err, Ok, Result
 
 
 def test_instance() -> None:
