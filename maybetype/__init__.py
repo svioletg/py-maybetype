@@ -194,6 +194,16 @@ class Maybe[T]:
             return Ok(self._val)
         return Err(err)
 
+    def ok_or_else[E](self, err: Callable[[], E]) -> Result[T, E]:
+        """
+        Converts this ``Maybe[T]`` to a ``Result[T, E]``.
+
+        ``Some(v)`` becomes ``Ok(v)`` where ``v`` is the wrapped value, and ``Nothing`` becomes ``Err(err())``.
+        """
+        if self._val is not None:
+            return Ok(self._val)
+        return Err(err())
+
     def reduce[U, R](self,
             other: Maybe[U],
             func: Callable[[T, U], R],

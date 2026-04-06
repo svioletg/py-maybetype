@@ -314,3 +314,6 @@ def test_ok_or() -> None:
 
     assert s.ok_or('failure') == Ok(1)
     assert Nothing.ok_or('failure') == Err('failure')
+
+    assert s.ok_or_else(lambda: 'failure') == Ok(1)
+    assert Nothing.ok_or_else(lambda: 'failure') == Err('failure')
