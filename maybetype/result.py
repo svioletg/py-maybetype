@@ -13,6 +13,8 @@ class Result[T, E]:
     A class which wraps a value of ``T`` if the instance is of the subclass ``Ok``, or wraps ``E`` if ``Err``.
     The ``Result`` class itself should only be using for type annotations and not instancing; use the ``Ok`` and ``Err``
     constructors otherwise.
+
+    ``Ok`` instances are always truthy, while ``Err`` instances are always falsy.
     """
     __match_args__ = ('_val',)
 
@@ -171,6 +173,17 @@ class Result[T, E]:
         if not self:
             return cast(E, self._val)
         return self._unwrap_fail(exc)
+
+    def unwrap_or(self, default: T) -> T:
+        """Returns the wrapped value if ``Ok``, otherwise returns ``default``."""
+        return cast(T, self._val) if self else default
+
+    def unwrap_or_else(self, func: Callable[[E], T]) -> T:
+        """
+        Returns the wrapped value if ``Ok``, otherwise calls ``func`` with the wrapped ``Err`` value and returns its
+        result.
+        """
+        return cast(T, self._val) if self else func(cast(E, self._val))
 
 class Ok[T, E](Result[T, E]):
     """Indicates a successful result of type ``T``."""

@@ -110,3 +110,9 @@ def test_unwrap() -> None:
         ok.unwrap_err(abort)
     with pytest.raises(ValueError, match='1'):
         ok.unwrap_err(ValueError)
+
+    assert ok.unwrap_or(2) == 1
+    assert err.unwrap_or(2) == 2  # noqa: PLR2004
+
+    assert ok.unwrap_or_else(len) == 1
+    assert err.unwrap_or_else(len) == 7  # noqa: PLR2004
