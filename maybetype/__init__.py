@@ -4,6 +4,8 @@ import warnings
 from collections.abc import Callable, Iterable
 from typing import Any, Never, Self, cast
 
+from maybetype.errors import ResultUnwrapError
+
 
 class Maybe[T]:
     """
@@ -14,8 +16,8 @@ class Maybe[T]:
 
     def __init__(self, val: T | None) -> None:
         warnings.warn(
-            'Direct instancing of Maybe() not intended and may cause unexpected behavior,'
-            + ' use the maybe() function instead',
+            'Direct instancing of Maybe not intended and may cause unexpected behavior,'
+            + ' use the maybe() function, instance Some, or use the Nothing singleton instead',
             stacklevel=2,
         )
         self._val: T | None = val
@@ -127,8 +129,8 @@ class Maybe[T]:
 
     def flatten(self) -> Maybe[T]:
         """
-        Converts ``Maybe[Maybe[T]]`` to ``Maybe[T]``. Only flattens one level at a time, and will raise a ``TypeError``
-        if called when the wrapped value is not ``Maybe``.
+        Returns a new ``Maybe[T]`` from a ``Maybe[Maybe[T]]``. Only flattens one level at a time, and will raise a
+        ``TypeError`` if called when the wrapped value is not ``Maybe``.
 
         .. note::
             It's expected that the resulting type of this method may not be correctly inferred and will return
@@ -170,7 +172,7 @@ class Maybe[T]:
         return maybe(default)
 
     def inspect(self, func: Callable[[T], Any]) -> Self:
-        """Calls a functioned with the wrapped value if ``Some``, otherwise does nothing. Returns this instance."""
+        """Calls a function with the wrapped value if ``Some``, otherwise does nothing. Returns this instance."""
         if self._val is not None:
             func(self._val)
         return self
@@ -181,6 +183,26 @@ class Maybe[T]:
         ``Some``, otherwise returns ``Nothing``.
         """
         return Some(func(self._val)) if self._val is not None else Nothing
+
+    def ok_or[E](self, err: E) -> Result[T, E]:
+        """
+        Converts this ``Maybe[T]`` to a ``Result[T, E]``.
+
+        ``Some(v)`` becomes ``Ok(v)`` where ``v`` is the wrapped value, and ``Nothing`` becomes ``Err(err)``.
+        """
+        if self._val is not None:
+            return Ok(self._val)
+        return Err(err)
+
+    def ok_or_else[E](self, err: Callable[[], E]) -> Result[T, E]:
+        """
+        Converts this ``Maybe[T]`` to a ``Result[T, E]``.
+
+        ``Some(v)`` becomes ``Ok(v)`` where ``v`` is the wrapped value, and ``Nothing`` becomes ``Err(err())``.
+        """
+        if self._val is not None:
+            return Ok(self._val)
+        return Err(err())
 
     def reduce[U, R](self,
             other: Maybe[U],
@@ -223,6 +245,27 @@ class Maybe[T]:
             (``U``).
         """
         return func(self._val) if self._val is not None else None
+
+    def transpose(self: Maybe[Result]) -> Result[Maybe[Any], Any]:
+        """
+        Transposes a ``Maybe`` of ``Result`` to a ``Result`` of ``Maybe``.
+
+        ``Some(Ok(x))`` becomes ``Ok(Some(x))``, ``Some(Err(x))`` becomes ``Err(x)``, ``Nothing`` becomes
+        ``Ok(Nothing)``.
+
+        .. note::
+            Currently the type information of the wrapped ``Result`` can't be known and used for the return type of
+            this method, so it will return ``Result[Maybe[Any], Any]``. You can use the :py:meth:`cast` method to
+            work around this for now.
+
+        :raises TypeError:
+            The wrapped value is not ``Result``.
+        """
+        if self._val is None:
+            return Ok(Nothing)
+        if not isinstance(self._val, Result):
+            raise TypeError(f'Cannot transpose Some instance which does not wrap Result: {self!r}')
+        return Ok(Some(self._val.unwrap())) if self._val else self._val
 
     def unwrap(self, exc: str | Exception | Callable[[], Never] = 'unwrapped Nothing') -> T:
         """
@@ -319,3 +362,198 @@ def maybe[T](val: T | None, predicate: Callable[[T], bool] = lambda v: v is not 
         ``maybe(val).filter(predicate)``.
     """
     return Nothing if (val is None) or not predicate(val) else Some(val)
+
+# Result type
+
+class Result[T, E]:
+    """
+    A class which wraps a value of ``T`` if the instance is of the subclass ``Ok``, or wraps ``E`` if ``Err``.
+    The ``Result`` class itself should only be using for type annotations and not instancing; use the ``Ok`` and ``Err``
+    constructors otherwise.
+
+    ``Ok`` instances are always truthy, while ``Err`` instances are always falsy.
+    """
+    __match_args__ = ('_val',)
+
+    def __init__(self, val: T | E) -> None:
+        warnings.warn(
+            'Direct instancing of Result is not intended and may cause unexpected behavior,'
+            + ' instance Ok or Err instead',
+            stacklevel=2,
+        )
+        self._val: T | E = val
+
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}({self._val!r})'
+
+    def __hash__(self) -> int:
+        return hash((self.__class__, self._val))
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Result):
+            return False
+        return hash(self) == hash(other)
+
+    def and_then[U](self, func: Callable[[T], Result[U, E]]) -> Result[U, E]:
+        """Returns ``func`` called with the wrapped value if ``Ok``, otherwise returns this instance."""
+        if self:
+            return func(cast(T, self._val))
+        return cast(Result[U, E], self)
+
+    def cast[U, F](self, t_type: type[U], e_type: type[F]) -> Result[U, F]:
+        """Returns a reference to this instance after casting its type as ``Result[t_type, e_type]``."""
+        return cast(Result[U, F], self)
+
+    def err(self) -> Maybe[E]:
+        """Returns a ``Some`` with the wrapped value if ``Err``, otherwise returns ``Nothing``."""
+        if self:
+            return Nothing
+        return Some(self._val)
+
+    def flatten(self) -> Result[T, E]:
+        """
+        Returns a new ``Result[T, E]`` from a``Result[Result[T, E], E]``. Only flattens one level at a time, and will
+        raise a ``TypeError`` if called when the wrapped value is not ``Result``.
+
+        .. note::
+            It's expected that the resulting type of this method may not be correctly inferred and will return
+            returning ``Result[Unknown, Unknown]``. For now, :py:meth:`cast` can be used to specify a type for type
+            checkers.
+
+        :raises TypeError:
+            The wrapped value is not ``Result``.
+        """
+        if not isinstance(self._val, Result):
+            raise TypeError(f'Cannot flatten when wrapped value is not of type Result: {self!r}')
+        return self._val
+
+    def inspect(self, func: Callable[[T], Any]) -> Self:
+        """Calls a function with the wrapped value if ``Ok``, otherwise does nothing. Returns this instance."""
+        if self:
+            func(cast(T, self._val))
+        return self
+
+    def inspect_err(self, func: Callable[[E], Any]) -> Self:
+        """Calls a function with the wrapped value if ``Err``, otherwise does nothing. Returns this instance."""
+        if self:
+            func(cast(E, self._val))
+        return self
+
+    def map[U](self, func: Callable[[T], U]) -> Result[U, E]:
+        """Returns a new ``Result`` with ``func`` mapped onto an ``Ok`` value, leaving an ``Err`` unmodified."""
+        if self:
+            return Ok(func(cast(T, self._val)))
+        return cast(Result[U, E], self)
+
+    def map_err[F](self, func: Callable[[E], F]) -> Result[T, F]:
+        """Returns a new ``Result`` with ``func`` mapped onto an ``Err`` value, leaving an ``Ok`` unmodified."""
+        if not self:
+            return Err(func(cast(E, self._val)))
+        return cast(Result[T, F], self)
+
+    def map_or[U](self, default: U, func: Callable[[T], U]) -> U:
+        """Returns ``func`` mapped onto the wrapped value if ``Ok``, otherwise returns ``default``."""
+        if self:
+            return func(cast(T, self._val))
+        return default
+
+    def map_or_else[U](self, default: Callable[[E], U], func: Callable[[T], U]) -> U:
+        """
+        Returns ``func`` mapped onto the wrapped value if ``Ok``, otherwise applying ``default`` to the ``Err`` value
+        and returning that.
+        """
+        if self:
+            return func(cast(T, self._val))
+        return default(cast(E, self._val))
+
+    def ok(self) -> Maybe[E]:
+        """Returns a ``Some`` with the wrapped value if ``Ok``, otherwise returns ``Nothing``."""
+        if not self:
+            return Nothing
+        return Some(self._val)
+
+    def transpose(self) -> Maybe[Result[T, E]]:
+        """
+        Transposes a ``Result`` of ``Maybe`` to a ``Maybe`` of ``Result``.
+
+        ``Ok(Nothing)`` becomes ``Nothing``. ``Ok(Some(x))`` and ``Err(x)`` become ``Some(Ok(x))`` and ``Some(Err(x))``
+        respectively.
+
+        :raises TypeError:
+            This is an ``Ok`` instance and the wrapped value is not ``Maybe``.
+        """
+        if not self:
+            return Some(self)
+        if not isinstance(self._val, Maybe):
+            raise TypeError(f'Cannot transpose Ok which does not wrap Maybe: {self!r}')
+        if self._val is Nothing:
+            return Nothing
+        return Some(Ok(self._val.unwrap()))
+
+    def _unwrap_fail(self, exc: str | type[Exception] | Callable[[E], Never]) -> Never:
+        if isinstance(exc, str):
+            raise ResultUnwrapError(f'{exc}: {self._val!r}')
+        if isinstance(exc, type) and issubclass(exc, Exception):
+            raise exc(repr(self._val))
+        if isinstance(exc, Callable):
+            exc(cast(E, self._val))
+        raise TypeError(f'Unexpected type for unwrap argument exc: {exc!r}')
+
+    def unwrap(self, exc: str | type[Exception] | Callable[[E], Never] = ResultUnwrapError) -> T:
+        """
+        Returns the wrapped value if ``Ok``, otherwise raises an error according to ``exc`` with the wrapped value as
+        the passed argument if ``exc`` is callable.
+
+        :param exc: If ``None``, a ``ResultUnwrapError`` is raised with the wrapped value as the exception message.
+            If given a string, ``ResultUnwrapError`` is raised with the message format ``{msg}: {repr(val)}``, where
+            ``val`` is the wrapped ``Err`` value.
+            If given an ``Exception`` type, that type of exception is raised with the wrapped value as the exception
+            argument.
+            If given a ``Callable``, ``exc`` is called with the wrapped value as the passed argument.
+        """
+        if self:
+            return cast(T, self._val)
+        return self._unwrap_fail(exc)
+
+    def unwrap_err(self, exc: str | type[Exception] | Callable[[E], Never] = ResultUnwrapError) -> E:
+        """
+        Returns the wrapped value if ``Err``, otherwise raises an error according to ``exc`` with the wrapped value as
+        the passed argument if ``exc`` is callable.
+
+        :param exc: If ``None``, a ``ResultUnwrapError`` is raised with the wrapped value as the exception message.
+            If given a string, ``ResultUnwrapError`` is raised with the message format ``{msg}: {repr(val)}``, where
+            ``val`` is the wrapped ``Ok`` value.
+            If given an ``Exception`` type, that type of exception is raised with the wrapped value as the exception
+            argument.
+            If given a ``Callable``, ``exc`` is called with the wrapped value as the passed argument.
+        """
+        if not self:
+            return cast(E, self._val)
+        return self._unwrap_fail(exc)
+
+    def unwrap_or(self, default: T) -> T:
+        """Returns the wrapped value if ``Ok``, otherwise returns ``default``."""
+        return cast(T, self._val) if self else default
+
+    def unwrap_or_else(self, func: Callable[[E], T]) -> T:
+        """
+        Returns the wrapped value if ``Ok``, otherwise calls ``func`` with the wrapped ``Err`` value and returns its
+        result.
+        """
+        return cast(T, self._val) if self else func(cast(E, self._val))
+
+class Ok[T, E](Result[T, E]):
+    """Indicates a successful result of type ``T``."""
+    def __init__(self, val: T) -> None:
+        self._val: T = val
+
+    def __bool__(self) -> bool:
+        return True
+
+class Err[T, E](Result[T, E]):
+    """Indicates a failed result of type ``E``."""
+    def __init__(self, val: E) -> None:
+        self._val: E = val
+
+    def __bool__(self) -> bool:
+        return False

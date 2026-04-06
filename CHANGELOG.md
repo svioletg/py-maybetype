@@ -11,6 +11,14 @@ Documentation here: <https://py-maybetype.readthedocs.io/en/latest/reference/>
 
 ## Unreleased
 
+### Added
+
+- Added classes `Result`, `Ok`, and `Err` to mimic the behavior of Rust's `Result` type
+  - See docs for all introduced methods: <https://py-maybetype.readthedocs.io/en/latest/reference/index.html#maybetype.Result>
+- Added the `errors` module
+  - Added exception `ResultUnwrapError`
+- Added test module `test_result`
+
 ### Changed
 
 - Changed docstring of function `maybe` to describe the `predicate` parameter more succinctly
@@ -31,7 +39,7 @@ Documentation here: <https://py-maybetype.readthedocs.io/en/latest/reference/>
 ### Added
 
 - Added method `Maybe.cast`
-  - Casts the type of the wrapped value: `maybe(...).cast(int)` → `maybe[int]`
+  - Casts the type of the wrapped value: `maybe(...).cast(int)` → `Maybe[int]`
 - Added method `Maybe.flatten`
   - Replicates Rust's [`Option::flatten`](https://doc.rust-lang.org/std/option/enum.Option.html#method.flatten)
 - Added method `Maybe.inspect`

@@ -5,7 +5,7 @@ from string import ascii_lowercase
 
 import pytest  # ty:ignore[unresolved-import, unused-ignore-comment]; seems to only show up in workflow runs?
 
-from maybetype import Maybe, Nothing, NothingType, Some, maybe
+from maybetype import Err, Maybe, Nothing, NothingType, Ok, Some, maybe
 
 ALPHANUMERIC: str = ascii_lowercase + '0123456789'
 MAYBE_UNWRAP_NONE_REGEX: re.Pattern[str] = re.compile(r"unwrapped Nothing")
@@ -308,3 +308,20 @@ def test_maybe_xor() -> None:
     assert s_a.xor(Nothing) == s_a
     assert Nothing.xor(s_b) == s_b
     assert Nothing.xor(Nothing) == Nothing
+
+def test_ok_or() -> None:
+    s = Some(1)
+
+    assert s.ok_or('failure') == Ok(1)
+    assert Nothing.ok_or('failure') == Err('failure')
+
+    assert s.ok_or_else(lambda: 'failure') == Ok(1)
+    assert Nothing.ok_or_else(lambda: 'failure') == Err('failure')
+
+def test_transpose() -> None:
+    s_ok = Some(Ok(1))
+    s_err = Some(Err('failure'))
+
+    assert Nothing.transpose() == Ok(Nothing)
+    assert s_ok.transpose() == Ok(Some(1))
+    assert s_err.transpose() == Err('failure')
