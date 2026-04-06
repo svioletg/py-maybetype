@@ -149,10 +149,6 @@ class Result[T, E]:
             return cast(E, self._val)
         return self._unwrap_fail(exc)
 
-# TODO: Consider having Ok and Err just be functions that return a Result instance, that may be easier to satisfy type
-#       checkers with? Then maybe the Result class just has an attribute to indicate whether it should be treated as
-#       Ok or Err?
-
 class Ok[T, E](Result[T, E]):
     def __init__(self, val: T) -> None:
         self._val: T = val
