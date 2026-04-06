@@ -277,9 +277,20 @@ class Maybe[T]:
 
 class NothingType(Maybe):
     __match_args__ = ()
+    _init_count: int = 0
 
     def __init__(self, _: None = None) -> None:
-        """The ``val`` attribute of a ``NothingType`` is always ``None``, so any parameter given is unused."""
+        """
+        The ``val`` attribute of a ``NothingType`` is always ``None``, so any parameter given is unused. A warning is
+        shown if ``NothingType`` is instanced any more than once.
+        """
+        if self.__class__._init_count > 0:  # noqa: SLF001
+            warnings.warn(
+                'Instancing NothingType directly may cause unexpected behavior, prefer using the maybetype.Nothing'
+                + ' singleton',
+                stacklevel=2,
+            )
+        self.__class__._init_count += 1  # noqa: SLF001
         self._val: None = None
 
     def __repr__(self) -> str:

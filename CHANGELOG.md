@@ -16,6 +16,8 @@ Documentation here: <https://py-maybetype.readthedocs.io/en/latest/reference/>
 - Changed docstring of function `maybe` to describe the `predicate` parameter more succinctly
 - Updated test `test_maybe.test_maybe_with_predicate_and_filter` to ensure
   `maybe(val).filter(predicate)` is equivalent to `maybe(val, predicate)`
+- Instancing `NothingType` more than once now emits a warning suggesting the use of the `Nothing`
+  singleton
 
 ## [0.10.1] - 2026-03-22
 
