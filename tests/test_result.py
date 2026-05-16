@@ -84,7 +84,7 @@ def test_map() -> None:
 def test_transpose() -> None:
     assert Ok(Some(1)).transpose() == Some(Ok(1))
     assert Ok(Nothing).transpose() is Nothing
-    assert Err(Some(1)).transpose() == Some(Err(1))
+    assert Err(Some(1)).transpose() == Some(Err(Some(1)))
     assert Err(Nothing).transpose() == Some(Err(Nothing))
 
 def test_unwrap() -> None:
