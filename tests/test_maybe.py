@@ -6,9 +6,14 @@ from string import ascii_lowercase
 import pytest  # ty:ignore[unresolved-import, unused-ignore-comment]; seems to only show up in workflow runs?
 
 from maybetype import Err, Maybe, Nothing, NothingType, Ok, Some, maybe
+from maybetype.errors import MaybeInstanceWarning, NothingTypeInitWarning
 
 ALPHANUMERIC: str = ascii_lowercase + '0123456789'
 MAYBE_UNWRAP_NONE_REGEX: re.Pattern[str] = re.compile(r"unwrapped Nothing")
+
+def test_maybe_instance_warning() -> None:
+    with pytest.warns(MaybeInstanceWarning):
+        Maybe(1)
 
 def test_unwrap_nothing() -> None:
     assert bool(Nothing) is False
@@ -45,7 +50,8 @@ def test_equality() -> None:
     ],
 )
 def test_nothing_instance_always_wraps_none(val: object) -> None:
-    assert NothingType(val)._val is None  # ty:ignore[invalid-argument-type]  # noqa: SLF001
+    with pytest.warns(NothingTypeInitWarning):
+        assert NothingType(val)._val is None  # ty:ignore[invalid-argument-type]  # noqa: SLF001
 
 def test_maybe_or() -> None:
     assert (Maybe.try_int('10') or Some(0)).unwrap() == 10  # noqa: PLR2004

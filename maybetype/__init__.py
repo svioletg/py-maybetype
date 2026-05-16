@@ -4,7 +4,7 @@ import warnings
 from collections.abc import Callable, Iterable
 from typing import Any, Never, Self, cast
 
-from maybetype.errors import ResultUnwrapError
+from maybetype.errors import MaybeInstanceWarning, NothingTypeInitWarning, ResultInstanceWarning, ResultUnwrapError
 
 
 class Maybe[T]:
@@ -16,8 +16,9 @@ class Maybe[T]:
 
     def __init__(self, val: T | None) -> None:
         warnings.warn(
-            'Direct instancing of Maybe not intended and may cause unexpected behavior,'
+            'Direct instancing of Maybe is not intended and may cause unexpected behavior;'
             + ' use the maybe() function, instance Some, or use the Nothing singleton instead',
+            MaybeInstanceWarning,
             stacklevel=2,
         )
         self._val: T | None = val
@@ -331,6 +332,7 @@ class NothingType(Maybe):
             warnings.warn(
                 'Instancing NothingType directly may cause unexpected behavior, prefer using the maybetype.Nothing'
                 + ' singleton',
+                NothingTypeInitWarning,
                 stacklevel=2,
             )
         self.__class__._init_count += 1  # noqa: SLF001
@@ -378,7 +380,8 @@ class Result[T, E]:  # noqa: PLW1641 ; Intentional, we want Ok and Err comparabl
     def __init__(self, val: T | E) -> None:
         warnings.warn(
             'Direct instancing of Result is not intended and may cause unexpected behavior,'
-            + ' instance Ok or Err instead',
+            + ' use Ok or Err instead',
+            ResultInstanceWarning,
             stacklevel=2,
         )
         self._val: T | E = val

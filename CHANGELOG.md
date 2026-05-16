@@ -11,11 +11,20 @@ Documentation here: <https://py-maybetype.readthedocs.io/en/latest/reference/>
 
 ## [Unreleased]
 
+### Added
+
+- Added `Warning` categories to `errors`:
+  - `MaybeInstanceWarning`: Emitted when creating a `Maybe` object directly
+  - `ResultInstanceWarning`: Emitted when creating a `Result` object directly
+  - `NothingTypeInitWarning`: Emitted when calling `NothingType.__init__()` for a second time
+    instead of using `Nothing`
+
 ### Changed
 
 - `Result` is no longer hashable, but is still comparable
   - Instead of comparing the hash of a tuple of the class and wrapped value, `False` is returned if
     the compared objects are not of the same type, otherwise their wrapped values are compared
+- Any warnings emitted now have a proper category assigned to them instead of only a message
 
 ### Removed
 
