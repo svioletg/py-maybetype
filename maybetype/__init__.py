@@ -80,8 +80,8 @@ class Maybe[T]:
 
     def and_then[U](self, func: Callable[[T], Maybe[U]]) -> Maybe[U]:
         """
-        Returns the result of ``func`` (which must return a ``Maybe``) called with this instance's wrapped value if
-        ``Some``, otherwise returns ``Nothing``.
+        Returns the result of ``func`` (which must return a ``Maybe``) called with the wrapped value if ``Some``,
+        otherwise returns ``Nothing``.
         """
         return func(self._val) if self._val is not None else Nothing
 
@@ -365,7 +365,7 @@ def maybe[T](val: T | None, predicate: Callable[[T], bool] = lambda v: v is not 
 
 # Result type
 
-class Result[T, E]:
+class Result[T, E]:  # noqa: PLW1641 ; Intentional, we want Ok and Err comparable but not hashable
     """
     A class which wraps a value of ``T`` if the instance is of the subclass ``Ok``, or wraps ``E`` if ``Err``.
     The ``Result`` class itself should only be using for type annotations and not instancing; use the ``Ok`` and ``Err``
@@ -386,13 +386,10 @@ class Result[T, E]:
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}({self._val!r})'
 
-    def __hash__(self) -> int:
-        return hash((self.__class__, self._val))
-
     def __eq__(self, other: object) -> bool:
-        if not isinstance(other, Result):
+        if not isinstance(other, self.__class__):
             return False
-        return hash(self) == hash(other)
+        return self._val == other._val
 
     def and_then[U](self, func: Callable[[T], Result[U, E]]) -> Result[U, E]:
         """Returns ``func`` called with the wrapped value if ``Ok``, otherwise returns this instance."""

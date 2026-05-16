@@ -18,6 +18,10 @@ def test_equality() -> None:
     assert Err('failure') == Err('failure')
     assert Err('failure') != Err('failed')
     assert Ok(1) != Err(1) != Ok(2) != Err(2)
+    # Test comparing unhashable types
+    assert Ok([]) == Ok([])
+    assert Ok([1, 2]) == Ok([1, 2])
+    assert Ok([1, 2]) != Ok([1, 2, 3])
 
 # Result methods
 

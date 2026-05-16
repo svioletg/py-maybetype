@@ -9,6 +9,18 @@ Generally, more significant breaking changes will be put near the top of each ca
 
 Documentation here: <https://py-maybetype.readthedocs.io/en/latest/reference/>
 
+## [Unreleased]
+
+### Changed
+
+- `Result` is no longer hashable, but is still comparable
+  - Instead of comparing the hash of a tuple of the class and wrapped value, `False` is returned if
+    the compared objects are not of the same type, otherwise their wrapped values are compared
+
+### Removed
+
+- Removed `__hash__` method from `Result`
+
 ## [0.11.0] - 2026-04-06
 
 ### Added
