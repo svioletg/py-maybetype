@@ -473,8 +473,8 @@ class Result[T, E]:  # noqa: PLW1641 ; Intentional, we want Ok and Err comparabl
         """
         Transposes a ``Result`` of ``Maybe`` to a ``Maybe`` of ``Result``.
 
-        ``Ok(Nothing)`` becomes ``Nothing``. ``Ok(Some(x))`` and ``Err(x)`` become ``Some(Ok(x))`` and ``Some(Err(x))``
-        respectively.
+        ``Ok(Nothing)`` becomes ``Nothing``, ``Ok(Some(x))`` becomes ``Some(Ok(x))``, and ``Err(x)`` becomes
+        ``Some(Err(x))``.
 
         :raises TypeError:
             This is an ``Ok`` instance and the wrapped value is not ``Maybe``.
