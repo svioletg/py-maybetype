@@ -5,6 +5,7 @@ from typing import Any, Never, Self, cast
 
 from maybetype.errors import MaybeInitError, NothingTypeInitError, ResultInitError, ResultUnwrapError
 
+__version__ = '0.12.0'
 
 class Maybe[T]:
     """
