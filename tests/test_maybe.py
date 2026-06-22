@@ -11,6 +11,9 @@ from maybetype.errors import MaybeInitError, NothingTypeInitError
 ALPHANUMERIC: str = ascii_lowercase + '0123456789'
 MAYBE_UNWRAP_NONE_REGEX: re.Pattern[str] = re.compile(r"unwrapped Nothing")
 
+def try_int(s: str) -> Maybe[int]:
+    return Some(int(s)) if s.isdigit() else Nothing
+
 def test_bool() -> None:
     assert bool(Some(1)) is True
     assert bool(Some(0)) is True
@@ -51,10 +54,10 @@ def test_nothingtype_init_error() -> None:
         NothingType()
 
 def test_maybe_or() -> None:
-    assert (Maybe.try_int('10') or Some(0)).unwrap() == 10  # noqa: PLR2004
-    assert (Maybe.try_int('ten') or Some(0)).unwrap() == 0
+    assert (try_int('10') or Some(0)).unwrap() == 10  # noqa: PLR2004
+    assert (try_int('ten') or Some(0)).unwrap() == 0
     with pytest.raises(ValueError, match=MAYBE_UNWRAP_NONE_REGEX):
-        Maybe.try_int('ten').unwrap()
+        try_int('ten').unwrap()
 
 @pytest.mark.parametrize(('val', 'default'),
     [
@@ -140,7 +143,7 @@ def test_maybe_get(val: object, accessor: object, result: object) -> None:
 
 def test_maybe_cat() -> None:
     assert Maybe.cat((Some(1), Some('one'), Nothing, Some(2))) == [1, 'one', 2]
-    assert Maybe.cat(map(Maybe.try_int, ALPHANUMERIC)) == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    assert Maybe.cat(map(try_int, ALPHANUMERIC)) == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 def test_maybe_cat_failure() -> None:
     with pytest.raises(AttributeError, match='has no attribute \'unwrap\''):
@@ -198,8 +201,8 @@ def test_pattern_matching[T](value: T, predicate: Callable[[T], bool], expected:
 
 @pytest.mark.parametrize(('value', 'func', 'expected'),
     [
-        (Some('1'), Maybe.try_int, Some(1)),
-        (Nothing, Maybe.try_int, Nothing),
+        (Some('1'), try_int, Some(1)),
+        (Nothing, try_int, Nothing),
     ],
 )
 def test_maybe_and_then[T, U](value: Maybe[T], func: Callable[[T], Maybe[U]], expected: Maybe[U]) -> None:
@@ -217,9 +220,9 @@ def test_maybe_sequence[T](vals: Iterable[Maybe[T]], expected: Maybe[list[T]]) -
 
 @pytest.mark.parametrize(('m', 'func', 'expected'),
     [
-        (Some('1'), Maybe.try_int, Some(1)),
-        (Some('one'), Maybe.try_int, Nothing),
-        (Nothing, Maybe.try_int, Nothing),
+        (Some('1'), try_int, Some(1)),
+        (Some('one'), try_int, Nothing),
+        (Nothing, try_int, Nothing),
     ],
 )
 def test_bind[T, U](m: Maybe[T], func: Callable[[T], Maybe[U]], expected: Maybe[U]) -> None:
