@@ -1,4 +1,4 @@
-from maybetype.const import PROJECT_VERSION
+import maybetype
 
 # Configuration file for the Sphinx documentation builder.
 #
@@ -10,7 +10,7 @@ from maybetype.const import PROJECT_VERSION
 
 project = 'py-maybetype'
 author = 'Seth "Violet" Gibbs'
-release = PROJECT_VERSION
+release = maybetype.__version__
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
