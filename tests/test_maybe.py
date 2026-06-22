@@ -146,7 +146,7 @@ def test_maybe_cat() -> None:
     assert Maybe.cat(map(try_int, ALPHANUMERIC)) == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 def test_maybe_cat_failure() -> None:
-    with pytest.raises(AttributeError, match='has no attribute \'unwrap\''):
+    with pytest.raises(AttributeError, match='has no attribute \'_val\''):
         Maybe.cat([1, 2, 3]) # type: ignore
 
 def is_valid_uuid(s: str) -> bool:

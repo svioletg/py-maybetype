@@ -48,7 +48,7 @@ class Maybe[T]:
         >>> assert vals == [Some(5), Nothing, Some(10), Nothing]
         >>> assert Maybe.cat(vals) == [5, 10]
         """
-        return [i.unwrap() for i in vals if i]
+        return [i._val for i in vals if i]  # noqa: SLF001
 
     @staticmethod
     def sequence(vals: Iterable[Maybe[T]]) -> Maybe[list[T]]:
@@ -63,7 +63,7 @@ class Maybe[T]:
         for i in vals:
             if i is Nothing:
                 return Nothing
-            unwrapped.append(i.unwrap())
+            unwrapped.append(i._val)  # noqa: SLF001
         return Some(unwrapped)
 
     def and_then[U](self, func: Callable[[T], Maybe[U]]) -> Maybe[U]:
@@ -75,11 +75,11 @@ class Maybe[T]:
 
     def as_list(self) -> list[T]:
         """Returns a list containing the wrapped value if ``Some``, otherwise returns an empty list."""
-        return [self.unwrap()] if self else []
+        return [self._val] if self else []
 
     def as_tuple(self) -> tuple[T] | tuple[()]:
         """Returns a tuple containing the wrapped value if ``Some``, otherwise returns an empty tuple."""
-        return (self.unwrap(),) if self else ()
+        return (self._val,) if self else ()
 
     def attr[U](self, name: str, default: U | None = None, typ: type[U] | None = None) -> Maybe[U]:
         """
@@ -117,7 +117,7 @@ class Maybe[T]:
         Returns ``self`` if ``Some`` and ``predicate`` called with this instance's wrapped value returns ``True``,
         otherwise returns ``Nothing``.
 
-        >>> assert Some(1).filter(lambda n: n > 0).unwrap() == 1
+        >>> assert Some(1).filter(lambda n: n > 0)._val == 1
         >>> assert Some(1).filter(lambda n: n > 1) is Nothing
         >>> assert Nothing.filter(lambda n: n > 1) is Nothing
         """
@@ -216,7 +216,7 @@ class Maybe[T]:
         :param strict: If ``True``, returns ``Nothing`` if ``self`` and ``other`` are not both ``Some``.
         """
         if self and other:
-            return Some(func(self.unwrap(), other.unwrap()))
+            return Some(func(self._val, other._val))
         return Nothing if strict else (self or other)
 
     def replace(self, new_val: T) -> Maybe[T]:
@@ -257,7 +257,7 @@ class Maybe[T]:
             return Ok(Nothing)
         if not isinstance(self._val, Result):
             raise TypeError(f'Cannot transpose Some instance which does not wrap Result: {self!r}')
-        return Ok(Some(self._val.unwrap())) if self._val else self._val
+        return Ok(Some(self._val._val)) if self._val else self._val  # noqa: SLF001
 
     def unwrap(self, exc: str | Exception | Callable[[], Never] = 'unwrapped Nothing') -> T:
         """
@@ -470,7 +470,7 @@ class Result[T, E]:  # noqa: PLW1641 ; Intentional, we want Ok and Err comparabl
             raise TypeError(f'Cannot transpose Ok which does not wrap Maybe: {self!r}')
         if self._val is Nothing:
             return Nothing
-        return Some(Ok(self._val.unwrap()))
+        return Some(Ok(self._val._val))  # noqa: SLF001
 
     def _unwrap_fail(self, exc: str | type[Exception] | Callable[[E], Never]) -> Never:
         if isinstance(exc, str):

@@ -31,6 +31,8 @@ Documentation here: <https://py-maybetype.readthedocs.io/en/latest/reference/>
   - Directly instancing `NothingType()` after it has already been instanced raises this error
 - `ResultInstanceWarning` renamed to `ResultInitError` and is now an exception
   - Directly instancing `Result()` raises this error
+- `Maybe` and `Result` methods no longer call `self.unwrap()`, instead accessing `self._val`
+  directly which is much faster, all usages of `self.unwrap()` had already checked for `Nothing`
 
 ### Removed
 
