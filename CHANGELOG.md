@@ -27,6 +27,7 @@ Documentation here: <https://py-maybetype.readthedocs.io/en/latest/reference/>
 
 ### Removed
 
+- Removed module `const`
 - Removed staticmethod `Maybe.try_int()`
 
 ## [0.12.0] - 2026-05-16
