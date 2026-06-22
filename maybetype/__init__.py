@@ -65,18 +65,6 @@ class Maybe[T]:
             unwrapped.append(i.unwrap())
         return Some(unwrapped)
 
-    @staticmethod
-    def try_int(val: Any) -> Maybe[int]:  # noqa: ANN401
-        """
-        Attempts to convert ``val`` to an ``int``, returning a ``Some``-wrapped ``int`` if successful, or
-        ``Nothing`` on failure.
-        """
-        try:
-            i: int = int(val)
-            return Some(i)
-        except ValueError:
-            return Nothing
-
     def and_then[U](self, func: Callable[[T], Maybe[U]]) -> Maybe[U]:
         """
         Returns the result of ``func`` (which must return a ``Maybe``) called with the wrapped value if ``Some``,

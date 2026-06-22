@@ -24,6 +24,10 @@ Documentation here: <https://py-maybetype.readthedocs.io/en/latest/reference/>
 - `ResultInstanceWarning` renamed to `ResultInitError` and is now an exception
   - Directly instancing `Result()` raises this error
 
+### Removed
+
+- Removed staticmethod `Maybe.try_int()`
+
 ## [0.12.0] - 2026-05-16
 
 ### Added
