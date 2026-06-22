@@ -6,13 +6,13 @@ from string import ascii_lowercase
 import pytest  # ty:ignore[unresolved-import, unused-ignore-comment]; seems to only show up in workflow runs?
 
 from maybetype import Err, Maybe, Nothing, NothingType, Ok, Some, maybe
-from maybetype.errors import MaybeInstanceWarning, NothingTypeInitWarning
+from maybetype.errors import MaybeInstanceError, NothingTypeInitError
 
 ALPHANUMERIC: str = ascii_lowercase + '0123456789'
 MAYBE_UNWRAP_NONE_REGEX: re.Pattern[str] = re.compile(r"unwrapped Nothing")
 
-def test_maybe_instance_warning() -> None:
-    with pytest.warns(MaybeInstanceWarning):
+def test_maybe_instance_error() -> None:
+    with pytest.raises(MaybeInstanceError):
         Maybe(1)
 
 def test_unwrap_nothing() -> None:
@@ -31,27 +31,18 @@ def test_unwrap_nothing_callback() -> None:
 def test_maybe_none_is_nothing() -> None:
     assert maybe(None) is Nothing
 
+def test_some_none_ok() -> None:
+    assert isinstance(Some(None), Some)
+    assert Some(None).map(lambda x: [x]).unwrap() == [None]
+
 def test_equality() -> None:
     assert maybe(1) == Some(1)
     assert maybe(1) != Some(2)
     assert maybe(1) != Nothing
 
-@pytest.mark.parametrize(('val'),
-    [
-        None,
-        0,
-        1,
-        '',
-        'string',
-        [],
-        [1, 2, 3],
-        True,
-        False,
-    ],
-)
-def test_nothing_instance_always_wraps_none(val: object) -> None:
-    with pytest.warns(NothingTypeInitWarning):
-        assert NothingType(val)._val is None  # ty:ignore[invalid-argument-type]  # noqa: SLF001
+def test_nothingtype_init_error() -> None:
+    with pytest.raises(NothingTypeInitError):
+        NothingType()
 
 def test_maybe_or() -> None:
     assert (Maybe.try_int('10') or Some(0)).unwrap() == 10  # noqa: PLR2004

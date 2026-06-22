@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-import warnings
 from collections.abc import Callable, Iterable
 from typing import Any, Never, Self, cast
 
-from maybetype.errors import MaybeInstanceWarning, NothingTypeInitWarning, ResultInstanceWarning, ResultUnwrapError
+from maybetype.errors import MaybeInstanceError, NothingTypeInitError, ResultInstanceError, ResultUnwrapError
 
 
 class Maybe[T]:
@@ -14,20 +13,16 @@ class Maybe[T]:
     """
     __match_args__ = ('_val',)
 
-    def __init__(self, val: T | None) -> None:
-        warnings.warn(
-            'Direct instancing of Maybe is not intended and may cause unexpected behavior;'
-            + ' use the maybe() function, instance Some, or use the Nothing singleton instead',
-            MaybeInstanceWarning,
-            stacklevel=2,
-        )
-        self._val: T | None = val
+    _val: T
+
+    def __init__(self, val: T) -> Never:
+        raise MaybeInstanceError('Maybe is not intended for direct usage, use maybe() or Some/Nothing')
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}({self._val!r})'
 
     def __bool__(self) -> bool:
-        return self._val is not None
+        return self is not Nothing
 
     def __eq__(self, other: object) -> bool:
         """
@@ -84,7 +79,7 @@ class Maybe[T]:
         Returns the result of ``func`` (which must return a ``Maybe``) called with the wrapped value if ``Some``,
         otherwise returns ``Nothing``.
         """
-        return func(self._val) if self._val is not None else Nothing
+        return func(self._val) if self else Nothing
 
     def attr[U](self, name: str, default: U | None = None, typ: type[U] | None = None) -> Maybe[U]:
         """
@@ -109,7 +104,7 @@ class Maybe[T]:
         Returns the result of ``func`` called with the wrapped value as its argument if ``Some``, otherwise returns
         ``Nothing``.
         """
-        if self._val is None:
+        if not self:
             return Nothing
         return func(self._val)
 
@@ -126,7 +121,7 @@ class Maybe[T]:
         >>> assert Some(1).filter(lambda n: n > 1) is Nothing
         >>> assert Nothing.filter(lambda n: n > 1) is Nothing
         """
-        return self if (self._val is not None) and predicate(self._val) else Nothing
+        return self if self and predicate(self._val) else Nothing
 
     def flatten(self) -> Maybe[T]:
         """
@@ -174,7 +169,7 @@ class Maybe[T]:
 
     def inspect(self, func: Callable[[T], Any]) -> Self:
         """Calls a function with the wrapped value if ``Some``, otherwise does nothing. Returns this instance."""
-        if self._val is not None:
+        if self:
             func(self._val)
         return self
 
@@ -183,7 +178,7 @@ class Maybe[T]:
         Returns a new ``Maybe`` with the result of calling ``func`` with the wrapped value of this instance if
         ``Some``, otherwise returns ``Nothing``.
         """
-        return Some(func(self._val)) if self._val is not None else Nothing
+        return Some(func(self._val)) if self else Nothing
 
     def ok_or[E](self, err: E) -> Result[T, E]:
         """
@@ -191,9 +186,7 @@ class Maybe[T]:
 
         ``Some(v)`` becomes ``Ok(v)`` where ``v`` is the wrapped value, and ``Nothing`` becomes ``Err(err)``.
         """
-        if self._val is not None:
-            return Ok(self._val)
-        return Err(err)
+        return Ok(self._val) if self else Err(err)
 
     def ok_or_else[E](self, err: Callable[[], E]) -> Result[T, E]:
         """
@@ -201,9 +194,7 @@ class Maybe[T]:
 
         ``Some(v)`` becomes ``Ok(v)`` where ``v`` is the wrapped value, and ``Nothing`` becomes ``Err(err())``.
         """
-        if self._val is not None:
-            return Ok(self._val)
-        return Err(err())
+        return Ok(self._val) if self else Err(err())
 
     def reduce[U, R](self,
             other: Maybe[U],
@@ -245,7 +236,7 @@ class Maybe[T]:
         :param func: A ``Callable`` which takes a type of the possible wrapped value (``T``) and can return any type
             (``U``).
         """
-        return func(self._val) if self._val is not None else None
+        return func(self._val) if self else None
 
     def transpose(self: Maybe[Result]) -> Result[Maybe[Any], Any]:
         """
@@ -262,7 +253,7 @@ class Maybe[T]:
         :raises TypeError:
             The wrapped value is not ``Result``.
         """
-        if self._val is None:
+        if not self:
             return Ok(Nothing)
         if not isinstance(self._val, Result):
             raise TypeError(f'Cannot transpose Some instance which does not wrap Result: {self!r}')
@@ -276,7 +267,7 @@ class Maybe[T]:
             as ``ValueError(exc)``. If an ``Exception`` object is given, it is raised. If a ``Callable`` is given, it
             is called with no arguments.
         """
-        if self._val is None:
+        if not self:
             if isinstance(exc, str):
                 raise ValueError(exc)
             if isinstance(exc, Exception):
@@ -288,11 +279,11 @@ class Maybe[T]:
 
     def unwrap_or(self, other: T) -> T:
         """Returns the wrapped value if ``Some``, otherwise returns ``other``."""
-        return self._val if self._val is not None else other
+        return self._val if self else other
 
     def unwrap_or_else(self, func: Callable[[], T]) -> T:
         """Returns the wrapped value if ``Some``, otherwise returns the result of calling ``func``."""
-        return self._val if self._val is not None else func()
+        return self._val if self else func()
 
     def unzip[U](self) -> tuple[Maybe[T], Maybe[U]]:
         """
@@ -304,7 +295,7 @@ class Maybe[T]:
         """
         if isinstance(self._val, tuple) and (len(self._val) == 2):  # noqa: PLR2004
             return (Some(self._val[0]), Some(self._val[1]))
-        if self._val is None:
+        if not self:
             return (Nothing, Nothing)
         raise TypeError(f'Cannot unzip Maybe if the wrapped value is not a 2-tuple: {self!r}')
 
@@ -317,7 +308,7 @@ class Maybe[T]:
         Returns a wrapped tuple of this and another ``Maybe`` instance's wrapped values if both are ``Some``, otherwise
         returns ``Nothing``.
         """
-        return Some((self._val, other._val)) if (self._val is not None) and (other._val is not None) else Nothing
+        return Some((self._val, other._val)) if self and (other._val is not None) else Nothing
 
 class NothingType(Maybe):
     __match_args__ = ()
@@ -329,12 +320,7 @@ class NothingType(Maybe):
         shown if ``NothingType`` is instanced any more than once.
         """
         if self.__class__._init_count > 0:  # noqa: SLF001
-            warnings.warn(
-                'Instancing NothingType directly may cause unexpected behavior, prefer using the maybetype.Nothing'
-                + ' singleton',
-                NothingTypeInitWarning,
-                stacklevel=2,
-            )
+            raise NothingTypeInitError('Cannot instance a second NothingType, use the Nothing singleton')
         self.__class__._init_count += 1  # noqa: SLF001
         self._val: None = None
 
@@ -377,14 +363,10 @@ class Result[T, E]:  # noqa: PLW1641 ; Intentional, we want Ok and Err comparabl
     """
     __match_args__ = ('_val',)
 
+    _val: T | E
+
     def __init__(self, val: T | E) -> None:
-        warnings.warn(
-            'Direct instancing of Result is not intended and may cause unexpected behavior,'
-            + ' use Ok or Err instead',
-            ResultInstanceWarning,
-            stacklevel=2,
-        )
-        self._val: T | E = val
+        raise ResultInstanceError('Result is not intended for direct usage, use Ok or Err')
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}({self._val!r})'

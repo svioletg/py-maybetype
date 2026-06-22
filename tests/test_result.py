@@ -3,7 +3,7 @@ from typing import Never
 import pytest
 
 from maybetype import Err, Nothing, Ok, Result, Some
-from maybetype.errors import ResultUnwrapError
+from maybetype.errors import ResultInstanceError, ResultUnwrapError
 
 
 def test_instance() -> None:
@@ -11,6 +11,8 @@ def test_instance() -> None:
     assert ok._val == 'success'  # noqa: SLF001
     err = Err('failure')
     assert err._val == 'failure'  # noqa: SLF001
+    with pytest.raises(ResultInstanceError):
+        Result(0)
 
 def test_equality() -> None:
     assert Ok(1) == Ok(1)
