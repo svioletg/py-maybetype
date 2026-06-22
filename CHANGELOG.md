@@ -17,11 +17,11 @@ Documentation here: <https://py-maybetype.readthedocs.io/en/latest/reference/>
 - `Maybe.__bool__()` now checks whether itself `is Nothing` rather than checking the wrapped value
   - All `self._val is not None` checks have been replaced with simply checking the truthiness of
     `self`
-- `MaybeInstanceWarning` renamed to `MaybeInstanceError` and is now an exception
+- `MaybeInstanceWarning` renamed to `MaybeInitError` and is now an exception
   - Directly instancing `Maybe()` raises this error
 - `NothingTypeInitWarning` renamed to `NothingTypeInitError` and is now an exception
   - Directly instancing `NothingType()` after it has already been instanced raises this error
-- `ResultInstanceWarning` renamed to `ResultInstanceError` and is now an exception
+- `ResultInstanceWarning` renamed to `ResultInitError` and is now an exception
   - Directly instancing `Result()` raises this error
 
 ## [0.12.0] - 2026-05-16

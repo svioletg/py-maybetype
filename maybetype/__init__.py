@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Callable, Iterable
 from typing import Any, Never, Self, cast
 
-from maybetype.errors import MaybeInstanceError, NothingTypeInitError, ResultInstanceError, ResultUnwrapError
+from maybetype.errors import MaybeInitError, NothingTypeInitError, ResultInitError, ResultUnwrapError
 
 
 class Maybe[T]:
@@ -12,14 +12,14 @@ class Maybe[T]:
     short-circuiting to ``None`` without longer checks.
 
     This is a base class that is subclassed by :py:class:`Some` and :py:class:`NothingType`, and will raise
-    :py:class:`errors.MaybeInstanceError` if instanced directly.
+    :py:class:`errors.MaybeInstanceError` if instanced directly
     """
     __match_args__ = ('_val',)
 
     _val: T
 
     def __init__(self, val: T) -> Never:
-        raise MaybeInstanceError('Maybe is not intended for direct usage, use maybe() or Some/Nothing')
+        raise MaybeInitError('Maybe is not intended for direct usage, use maybe() or Some/Nothing')
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}({self._val!r})'
@@ -369,7 +369,7 @@ class Result[T, E]:  # noqa: PLW1641 ; Intentional, we want Ok and Err comparabl
     _val: T | E
 
     def __init__(self, val: T | E) -> None:
-        raise ResultInstanceError('Result is not intended for direct usage, use Ok or Err')
+        raise ResultInitError('Result is not intended for direct usage, use Ok or Err')
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}({self._val!r})'
