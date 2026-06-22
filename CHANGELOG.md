@@ -11,6 +11,13 @@ Documentation here: <https://py-maybetype.readthedocs.io/en/latest/reference/>
 
 ## [Unreleased]
 
+### Added
+
+- Added method `Maybe.as_list()`
+  - Replicates Rust's [`Option::as_mut_slice`](https://doc.rust-lang.org/std/option/enum.Option.html#method.as_mut_slice)
+- Added method `Maybe.as_tuple()`
+  - Replicates Rust's [`Option::as_slice`](https://doc.rust-lang.org/std/option/enum.Option.html#method.as_slice)
+
 ### Changed
 
 - `Some` now supports wrapping `None`

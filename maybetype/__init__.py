@@ -73,6 +73,14 @@ class Maybe[T]:
         """
         return func(self._val) if self else Nothing
 
+    def as_list(self) -> list[T]:
+        """Returns a list containing the wrapped value if ``Some``, otherwise returns an empty list."""
+        return [self.unwrap()] if self else []
+
+    def as_tuple(self) -> tuple[T] | tuple[()]:
+        """Returns a tuple containing the wrapped value if ``Some``, otherwise returns an empty tuple."""
+        return (self.unwrap(),) if self else ()
+
     def attr[U](self, name: str, default: U | None = None, typ: type[U] | None = None) -> Maybe[U]:
         """
         Attempts to access an attribute ``name`` on the wrapped object, returning a ``Some`` instance wrapping the

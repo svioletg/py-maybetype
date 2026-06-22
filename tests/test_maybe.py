@@ -331,3 +331,11 @@ def test_transpose() -> None:
     assert Nothing.transpose() == Ok(Nothing)
     assert s_ok.transpose() == Ok(Some(1))
     assert s_err.transpose() == Err('failure')
+
+def test_as_list() -> None:
+    assert Some(1).as_list() == [1]
+    assert Nothing.as_list() == []
+
+def test_as_tuple() -> None:
+    assert Some(1).as_tuple() == (1,)
+    assert Nothing.as_tuple() == ()
