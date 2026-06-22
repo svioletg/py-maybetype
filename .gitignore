@@ -12,6 +12,9 @@ wheels/
 # Sphinx-generated files
 _build/
 
+# Tool-generated files
+.coverage
+
 # Other
 _*/
 /_*
