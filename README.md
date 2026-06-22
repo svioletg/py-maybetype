@@ -1,24 +1,18 @@
 # py-maybetype
 
 ![Linting & testing](https://github.com/svioletg/py-maybetype/actions/workflows/lint-test.yml/badge.svg)
+![PyPI publishing](https://github.com/svioletg/py-maybetype/actions/workflows/publish-to-pypi.yml/badge.svg)
 
 Documentation: <https://py-maybetype.readthedocs.io/en/latest/>
 
 PyPI: <https://pypi.org/project/py-maybetype/>
 
-> [!WARNING]
-> I'm not considering any version before 1.0 stable, and breaking changes are likely with each 0.x
-> release. Though I'm using it in my own projects, I wouldn't consider it "production-ready" until
-> a 1.0.0 release is made.
+> [!WARNING] This project is in beta, and breaking changes are likely with each 0.x release.
 
-A basic implementation of a maybe/option type in Python, largely inspired by Rust's [`Option`](https://doc.rust-lang.org/std/option/enum.Option.html).
-This was created as part of a separate project I had been working on, but I decided to make it into
-its own package as I wanted to use it elsewhere and its scope grew. This is not meant to be a 1:1
-replication or replacement for Rust's `Option` or Haskell's `Maybe`, but rather an
-interperetation of the idea that I feel works for Python.
-
-This package also implements a [`Result`](https://doc.rust-lang.org/std/result/enum.Result.html)
-type which can be used to wrap either a success (`Ok`) or failure (`Err`) value.
+A basic implementation of a maybe/option type in Python, largely aiming for parity (within reason)
+with Rust's [`Option`](https://doc.rust-lang.org/std/option/enum.Option.html) and
+[`Result`](https://doc.rust-lang.org/std/result/enum.Result.html) types implemented in a way that
+makes sense for Python.
 
 ## Usage
 
@@ -28,15 +22,15 @@ Install with `pip`:
 pip install py-maybetype
 ```
 
-Call the `maybe()` function with a `T | None` value to return a `Maybe[T]`—either a `Some` instance
+Call the `maybe()` function with a `T | None` value to return either a `Some[T]` instance
 containing the wrapped value, or the `Nothing` singleton. You can also directly use the `Some`
 constructor or the `Nothing` singleton explicitly e.g. when returning a value from a function.
-`Maybe` only serves as a superclass to provide methods for `Some` and `Nothing` and to be used
-for typing, it should not be instanced directly. If it is, a warning is emitted.
+`Maybe` only serves as a base class to provide methods for `Some` and `Nothing` and to be used for
+typing, it should not be instanced directly. If it is, `MaybeInstanceError` is raised.
 
-`Nothing` is just an instance of the `NothingType` class, and should be used instead of creating
-new `NothingType` instances since all are functionally identical. A warning is emitted if the class
-is instanced more than once.
+`Nothing` is an instance of the `NothingType` class, and should be used instead of creating new
+`NothingType` instances since all are functionally identical. `NothingTypeInitError` if the class is
+instanced more than once.
 
 ```python
 from maybetype import Maybe, maybe
@@ -57,17 +51,10 @@ num2: Maybe[int] = maybe(try_int('five'))
 print(num1.unwrap()) # 5
 print(num2.unwrap()) # (raises ValueError)
 
-# Some() instances are always truthy, Nothing is falsy
+# Some() instances are always truthy, NothingType() is falsy
 
 assert bool(num1) is True
 assert bool(num2) is False
-```
-
-This example in particular can also be done with the `Maybe.try_int()` class method:
-
-```python
-num1: Maybe[int] = Maybe.try_int('5')
-num2: Maybe[int] = Maybe.try_int('five')
 ```
 
 The `maybe` constructor can be given an optional predicate argument to specify a custom condition
