@@ -10,6 +10,9 @@ class Maybe[T]:
     """
     Wraps a value that may be ``T`` or ``None``, providing methods for conditionally using that value or
     short-circuiting to ``None`` without longer checks.
+
+    This is a base class that is subclassed by :py:class:`Some` and :py:class:`NothingType`, and will raise
+    :py:class:`errors.MaybeInstanceError` if instanced directly.
     """
     __match_args__ = ('_val',)
 
