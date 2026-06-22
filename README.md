@@ -1,6 +1,7 @@
 # py-maybetype
 
-![Linting & testing](https://github.com/svioletg/py-maybetype/actions/workflows/lint-test.yml/badge.svg)
+![Linting](https://github.com/svioletg/py-maybetype/actions/workflows/type-lint.yml/badge.svg)
+![Testing](https://github.com/svioletg/py-maybetype/actions/workflows/build-test.yml/badge.svg)
 ![PyPI publishing](https://github.com/svioletg/py-maybetype/actions/workflows/publish-to-pypi.yml/badge.svg)
 
 Documentation: <https://py-maybetype.readthedocs.io/en/latest/>
