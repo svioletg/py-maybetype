@@ -16,7 +16,8 @@ Documentation here: <https://py-maybetype.readthedocs.io/en/latest/reference/>
 - `Some` now supports wrapping `None`
 - `Maybe.__bool__()` now checks whether itself `is Nothing` rather than checking the wrapped value
   - All `self._val is not None` checks have been replaced with simply checking the truthiness of
-    `self`
+    `self`, making the statement that `Some` instances are all truthy and `Nothing` is falsy more
+    accurate
 - `MaybeInstanceWarning` renamed to `MaybeInitError` and is now an exception
   - Directly instancing `Maybe()` raises this error
 - `NothingTypeInitWarning` renamed to `NothingTypeInitError` and is now an exception
