@@ -486,7 +486,7 @@ class Result[T, E]:  # noqa: PLW1641 ; Intentional, we want Ok and Err comparabl
         Returns the wrapped value if ``Ok``, otherwise raises an error according to ``exc`` with the wrapped value as
         the passed argument if ``exc`` is callable.
 
-        :param exc: If ``None``, a ``ResultUnwrapError`` is raised with the wrapped value as the exception message.
+        :param exc: By default, ``ResultUnwrapError`` is raised with the wrapped value as the exception argument.
             If given a string, ``ResultUnwrapError`` is raised with the message format ``{msg}: {repr(val)}``, where
             ``val`` is the wrapped ``Err`` value.
             If given an ``Exception`` type, that type of exception is raised with the wrapped value as the exception
@@ -502,7 +502,7 @@ class Result[T, E]:  # noqa: PLW1641 ; Intentional, we want Ok and Err comparabl
         Returns the wrapped value if ``Err``, otherwise raises an error according to ``exc`` with the wrapped value as
         the passed argument if ``exc`` is callable.
 
-        :param exc: If ``None``, a ``ResultUnwrapError`` is raised with the wrapped value as the exception message.
+        :param exc: By default, ``ResultUnwrapError`` is raised with the wrapped value as the exception argument.
             If given a string, ``ResultUnwrapError`` is raised with the message format ``{msg}: {repr(val)}``, where
             ``val`` is the wrapped ``Ok`` value.
             If given an ``Exception`` type, that type of exception is raised with the wrapped value as the exception
