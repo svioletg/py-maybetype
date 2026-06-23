@@ -238,12 +238,16 @@ class Maybe[T]:
         """
         return func(self._val) if self else None
 
-    def transpose(self: Maybe[Result]) -> Result[Maybe[Any], Any]:
+    def transpose[E](self: Maybe[Result[Any, E]]) -> Result[Maybe[Any], E]:
         """
         Transposes a ``Maybe`` of ``Result`` to a ``Result`` of ``Maybe``.
 
         ``Some(Ok(x))`` becomes ``Ok(Some(x))``, ``Some(Err(x))`` becomes ``Err(x)``, ``Nothing`` becomes
         ``Ok(Nothing)``.
+
+        >>> assert Some(Ok(1)).transpose()  == Ok(Some(1))
+        >>> assert Some(Err(0)).transpose() == Err(0)
+        >>> assert Nothing.transpose()      == Ok(Nothing)
 
         .. note::
             Currently the type information of the wrapped ``Result`` can't be known and used for the return type of
@@ -253,11 +257,12 @@ class Maybe[T]:
         :raises TypeError:
             The wrapped value is not ``Result``.
         """
-        if not self:
+        if self is Nothing:
             return Ok(Nothing)
         if not isinstance(self._val, Result):
             raise TypeError(f'Cannot transpose Some instance which does not wrap Result: {self!r}')
-        return Ok(Some(self._val._val)) if self._val else self._val  # noqa: SLF001
+
+        return Ok(Some(self._val._val)) if self._val else Err(self._val._val)  # noqa: SLF001
 
     def unwrap(self, exc: str | Exception | Callable[[], Never] = 'unwrapped Nothing') -> T:
         """

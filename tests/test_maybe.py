@@ -325,12 +325,9 @@ def test_ok_or() -> None:
     assert Nothing.ok_or_else(lambda: 'failure') == Err('failure')
 
 def test_transpose() -> None:
-    s_ok = Some(Ok(1))
-    s_err = Some(Err('failure'))
-
     assert Nothing.transpose() == Ok(Nothing)
-    assert s_ok.transpose() == Ok(Some(1))
-    assert s_err.transpose() == Err('failure')
+    assert Some(Ok(1)).transpose() == Ok(Some(1))
+    assert Some(Err('failure')).transpose() == Err('failure')
 
 def test_as_list() -> None:
     assert Some(1).as_list() == [1]
