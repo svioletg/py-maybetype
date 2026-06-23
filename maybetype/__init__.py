@@ -284,8 +284,7 @@ class Maybe[T]:
         """Returns ``Some`` wrapping a tuple of ``self`` and ``other``'s values if both are ``Some``, otherwise returns
         ``Nothing``.
         """  # noqa: D205
-        # TODO(svioletg): other._val is not None should just be other
-        return Some((self._val, other._val)) if self and (other._val is not None) else Nothing
+        return Some((self._val, other._val)) if self and other else Nothing
 
 class NothingType(Maybe):
     """Subclass of ``Maybe`` representing no value."""
