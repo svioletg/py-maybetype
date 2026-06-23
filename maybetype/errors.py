@@ -1,3 +1,5 @@
+"""Exceptions and warnings for ``maybetype``."""
+
 class MaybeInitError(Exception):
     """Raised when creating a ``Maybe`` object directly."""
 class NothingTypeInitError(Exception):

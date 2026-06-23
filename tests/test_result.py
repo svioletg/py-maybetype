@@ -97,13 +97,13 @@ def test_unwrap() -> None:
     err = Err('failure')
 
     assert ok.unwrap() == 1
-    with pytest.raises(ResultUnwrapError, match='\'failure\''):
+    with pytest.raises(ResultUnwrapError, match="'failure'"):
         err.unwrap()
-    with pytest.raises(ResultUnwrapError, match='Something went wrong: \'failure\''):
+    with pytest.raises(ResultUnwrapError, match="Something went wrong: 'failure'"):
         err.unwrap('Something went wrong')
     with pytest.raises(ValueError, match='failure'):
         err.unwrap(abort)
-    with pytest.raises(ValueError, match='\'failure\''):
+    with pytest.raises(ValueError, match="'failure'"):
         err.unwrap(ValueError)
 
     assert err.unwrap_err() == 'failure'

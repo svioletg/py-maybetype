@@ -9,7 +9,7 @@ from maybetype import Err, Maybe, Nothing, NothingType, Ok, Some, maybe
 from maybetype.errors import MaybeInitError, NothingTypeInitError
 
 ALPHANUMERIC: str = ascii_lowercase + '0123456789'
-MAYBE_UNWRAP_NONE_REGEX: re.Pattern[str] = re.compile(r"unwrapped Nothing")
+MAYBE_UNWRAP_NONE_REGEX: re.Pattern[str] = re.compile(r'unwrapped Nothing')
 
 def try_int(s: str) -> Maybe[int]:
     return Some(int(s)) if s.isdigit() else Nothing
@@ -146,11 +146,11 @@ def test_maybe_cat() -> None:
     assert Maybe.cat(map(try_int, ALPHANUMERIC)) == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 def test_maybe_cat_failure() -> None:
-    with pytest.raises(AttributeError, match='has no attribute \'_val\''):
-        Maybe.cat([1, 2, 3]) # type: ignore
+    with pytest.raises(AttributeError, match="has no attribute '_val'"):
+        Maybe.cat([1, 2, 3])  # ty:ignore[invalid-argument-type]
 
 def is_valid_uuid(s: str) -> bool:
-    return re.match(r"[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}|[0-9a-f]{32}", s) is not None
+    return re.match(r'[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}|[0-9a-f]{32}', s) is not None
 
 @pytest.mark.parametrize(('value', 'predicate', 'expected_bool'),
     [
@@ -229,7 +229,7 @@ def test_bind[T, U](m: Maybe[T], func: Callable[[T], Maybe[U]], expected: Maybe[
     assert m.bind(func) == expected
 
 @dataclass
-class Point:
+class Point:  # noqa: D101
     x: int
     y: int
 
@@ -270,7 +270,7 @@ def test_maybe_flatten() -> None:
     assert Some(Some(1)).flatten() == Some(1)
     assert Some(Nothing).flatten() is Nothing
 
-    with pytest.raises(TypeError, match=r"Cannot flatten.*"):
+    with pytest.raises(TypeError, match=r'Cannot flatten.*'):
         Some(1).flatten()
 
 def test_maybe_cast() -> None:
@@ -300,10 +300,10 @@ def test_maybe_unzip() -> None:
     assert Some((1, 2)).unzip() == (Some(1), Some(2))
     assert Nothing.unzip() == (Nothing, Nothing)
 
-    with pytest.raises(TypeError, match=r"Cannot unzip"):
+    with pytest.raises(TypeError, match=r'Cannot unzip'):
         assert Some((1, 2, 3)).unzip()
 
-    with pytest.raises(TypeError, match=r"Cannot unzip"):
+    with pytest.raises(TypeError, match=r'Cannot unzip'):
         assert Some(1).unzip() == (Nothing, Nothing)
 
 def test_maybe_xor() -> None:

@@ -1,4 +1,4 @@
-import maybetype
+import maybetype  # noqa: D100, INP001
 
 # Configuration file for the Sphinx documentation builder.
 #
