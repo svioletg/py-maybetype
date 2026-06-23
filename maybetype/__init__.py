@@ -263,9 +263,9 @@ class Maybe[T]:
         """
         Returns the wrapped value if ``Some``, otherwise raises ``ValueError`` or fails according to ``exc``.
 
-        :param exc: The exception to raise when unwrapping ``Nothing``. If a string is given, ``ValueError`` is raised
-            as ``ValueError(exc)``. If an ``Exception`` object is given, it is raised. If a ``Callable`` is given, it
-            is called with no arguments.
+        :param exc: If a string is given, ``ValueError`` is raised with the string as its argument.
+            If an ``Exception`` instance is given, it is raised.
+            If a ``Callable`` is given, it is called with no arguments.
         """
         if not self:
             if isinstance(exc, str):
