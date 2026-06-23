@@ -218,16 +218,6 @@ def test_maybe_and_then[T, U](value: Maybe[T], func: Callable[[T], Maybe[U]], ex
 def test_maybe_sequence[T](vals: Iterable[Maybe[T]], expected: Maybe[list[T]]) -> None:
     assert Maybe.sequence(vals) == expected
 
-@pytest.mark.parametrize(('m', 'func', 'expected'),
-    [
-        (Some('1'), try_int, Some(1)),
-        (Some('one'), try_int, Nothing),
-        (Nothing, try_int, Nothing),
-    ],
-)
-def test_bind[T, U](m: Maybe[T], func: Callable[[T], Maybe[U]], expected: Maybe[U]) -> None:
-    assert m.bind(func) == expected
-
 @dataclass
 class Point:  # noqa: D101
     x: int

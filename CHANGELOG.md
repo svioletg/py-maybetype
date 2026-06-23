@@ -42,6 +42,8 @@ Documentation here: <https://py-maybetype.readthedocs.io/en/latest/reference/>
 - Removed module `const`
 - Removed staticmethod `Maybe.try_int()`
 - Removed classvar `NothingType._init_count`
+- Removed method `Maybe.bind()`
+  - Equivalent to `Maybe.and_then()`
 
 ## [0.12.0] - 2026-05-16
 

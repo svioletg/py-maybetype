@@ -93,13 +93,6 @@ class Maybe[T]:
         except AttributeError:
             return Nothing
 
-    # TODO(svioletg): remove method bind()
-    def bind[U](self, func: Callable[[T], Maybe[U]]) -> Maybe[U]:
-        """Returns ``func(val)`` if ``Some``, otherwise returns ``Nothing``."""
-        if not self:
-            return Nothing
-        return func(self._val)
-
     def cast[U](self, _typ: type[U]) -> Maybe[U]:
         """Returns a reference to this instance after casting its type as ``Maybe[typ]``."""
         return cast('Maybe[U]', self)
