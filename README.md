@@ -14,7 +14,7 @@ PyPI: <https://pypi.org/project/py-maybetype/>
 A basic implementation of a maybe/option type in Python, largely aiming for parity (within reason)
 with Rust's [`Option`](https://doc.rust-lang.org/std/option/enum.Option.html) and
 [`Result`](https://doc.rust-lang.org/std/result/enum.Result.html) types implemented in a way that
-makes sense for Python.
+makes sense for Python, with a few additional methods.
 
 ## Usage
 
