@@ -8,7 +8,8 @@ Documentation: <https://py-maybetype.readthedocs.io/en/latest/>
 
 PyPI: <https://pypi.org/project/py-maybetype/>
 
-> [!WARNING] This project is in beta, and breaking changes are likely with each 0.x release.
+> [!WARNING]
+> This project is in beta, and breaking changes are likely with each 0.x release.
 
 A basic implementation of a maybe/option type in Python, largely aiming for parity (within reason)
 with Rust's [`Option`](https://doc.rust-lang.org/std/option/enum.Option.html) and
