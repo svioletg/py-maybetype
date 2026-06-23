@@ -17,6 +17,7 @@ Documentation here: <https://py-maybetype.readthedocs.io/en/latest/reference/>
   - Replicates Rust's [`Option::as_mut_slice`](https://doc.rust-lang.org/std/option/enum.Option.html#method.as_mut_slice)
 - Added method `Maybe.as_tuple()`
   - Replicates Rust's [`Option::as_slice`](https://doc.rust-lang.org/std/option/enum.Option.html#method.as_slice)
+- Added classvar `NothingType._exists`
 
 ### Changed
 
@@ -33,11 +34,14 @@ Documentation here: <https://py-maybetype.readthedocs.io/en/latest/reference/>
   - Directly instancing `Result()` raises this error
 - `Maybe` and `Result` methods no longer call `self.unwrap()`, instead accessing `self._val`
   directly which is much faster, all usages of `self.unwrap()` had already checked for `Nothing`
+- The existence of a `NothingType` instance is now checked in `NothingType.__new__()` instead of
+  `__init__()`, and a `bool` is used instead of an `int`
 
 ### Removed
 
 - Removed module `const`
 - Removed staticmethod `Maybe.try_int()`
+- Removed classvar `NothingType._init_count`
 
 ## [0.12.0] - 2026-05-16
 

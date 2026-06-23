@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Iterable
-from typing import Any, Never, Self, cast
+from typing import Any, ClassVar, Never, Self, cast
 
 from maybetype.errors import MaybeInitError, NothingTypeInitError, ResultInitError, ResultUnwrapError
 
@@ -312,16 +312,21 @@ class Maybe[T]:
 
 class NothingType(Maybe):
     __match_args__ = ()
-    _init_count: int = 0
+
+    _exists: ClassVar[bool] = False
+
+    def __new__(cls, _: None = None) -> Self:
+        if cls._exists:
+            raise NothingTypeInitError('Cannot instance a second NothingType, use the Nothing singleton')
+        cls._exists = True
+
+        return super().__new__(cls)
 
     def __init__(self, _: None = None) -> None:
         """
         The ``val`` attribute of a ``NothingType`` is always ``None``, so any parameter given is unused. A warning is
         shown if ``NothingType`` is instanced any more than once.
         """
-        if self.__class__._init_count > 0:  # noqa: SLF001
-            raise NothingTypeInitError('Cannot instance a second NothingType, use the Nothing singleton')
-        self.__class__._init_count += 1  # noqa: SLF001
         self._val: None = None
 
     def __repr__(self) -> str:
