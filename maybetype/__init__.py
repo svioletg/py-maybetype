@@ -1,6 +1,7 @@
 """A basic implementation of a maybe/option type in Python, as well as a Result type."""
 from __future__ import annotations
 
+import re
 from collections.abc import Callable, Iterable
 from typing import Any, ClassVar, Never, Self, cast, override
 
@@ -339,6 +340,34 @@ def maybe[T](val: T | None, predicate: Callable[[T], bool] = lambda v: v is not 
         ``maybe(val).filter(predicate)``.
     """
     return Nothing if (val is None) or not predicate(val) else Some(val)
+
+def maybe_exc[T](
+        fn: Callable[[], T],
+        *exc: type[Exception] | tuple[type[Exception], str | re.Pattern],
+    ) -> Maybe[T]:
+    r"""Returns ``Nothing`` if ``fn()`` raises the specified error(s), otherwise returns ``Some`` with its result.
+
+    >>> assert maybe_exc(int('1'), ValueError) == Some(1)
+    >>> assert maybe_exc(int('one'), ValueError) == Nothing
+    >>> assert maybe_exc(int('one'), (ValueError, r'invalid literal for int\(\).*')) == Nothing
+
+    :param fn: A function to call which takes no arguments.
+    :param exc: One or more either exception types or a tuple of an exception type and regex pattern to match the raised
+        exception's message against, where if any of the given exceptions are raised (and if a pattern is given,
+        ``str(e)`` where ``e`` is the raised exception must match it), ``Nothing`` is returned instead of propagating
+        the exception. If any exceptions not listed are raised or a pattern is given for an exception and it does not
+        match, the exception is raised normally.
+    """
+    excmap: dict[type[Exception], str | re.Pattern[str]] = dict(i if isinstance(i, tuple) else (i, '') for i in exc)
+
+    try:
+        result: T = fn()
+    except tuple(excmap) as e:
+        if (p := excmap[e.__class__]) and not re.match(p, str(e)):
+            raise
+        return Nothing
+
+    return Some(result)
 
 # Result type
 

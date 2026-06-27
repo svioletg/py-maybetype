@@ -5,7 +5,7 @@ from string import ascii_lowercase
 
 import pytest  # ty:ignore[unresolved-import, unused-ignore-comment]; seems to only show up in workflow runs?
 
-from maybetype import Err, Maybe, Nothing, NothingType, Ok, Some, maybe
+from maybetype import Err, Maybe, Nothing, NothingType, Ok, Some, maybe, maybe_exc
 from maybetype.errors import MaybeInitError, NothingTypeInitError
 
 ALPHANUMERIC: str = ascii_lowercase + '0123456789'
@@ -326,3 +326,26 @@ def test_as_list() -> None:
 def test_as_tuple() -> None:
     assert Some(1).as_tuple() == (1,)
     assert Nothing.as_tuple() == ()
+
+def test_maybe_exc() -> None:
+    def fn[T](x: T) -> T:
+        if not isinstance(x, int):
+            raise TypeError('not an int')
+
+        if x < 0:
+            raise ValueError('cannot be negative')
+
+        return x
+
+    assert maybe_exc(lambda: int('1'), ValueError) == Some(1)
+    assert maybe_exc(lambda: int('one'), ValueError) is Nothing
+    assert maybe_exc(lambda: fn(1), TypeError, ValueError) == Some(1)
+    assert maybe_exc(lambda: fn('1'), TypeError, ValueError) == Nothing
+    assert maybe_exc(lambda: fn(1), (TypeError, 'not an int'), (ValueError, 'cannot be negative')) == Some(1)
+    assert maybe_exc(lambda: fn(-1), (TypeError, 'not an int'), (ValueError, 'cannot be negative')) == Nothing
+    assert maybe_exc(lambda: fn('1'), (TypeError, 'not an int'), (ValueError, 'cannot be negative')) == Nothing
+
+    with pytest.raises(TypeError, match='not an int'):
+        maybe_exc(lambda: fn('1'), (ValueError, 'cannot be negative'))
+    with pytest.raises(ValueError, match='cannot be negative'):
+        maybe_exc(lambda: fn(-1), (TypeError, 'not an int'))

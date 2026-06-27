@@ -18,6 +18,7 @@ Documentation here: <https://py-maybetype.readthedocs.io/en/latest/reference/>
 - Added method `Maybe.as_tuple()`
   - Replicates Rust's [`Option::as_slice`](https://doc.rust-lang.org/std/option/enum.Option.html#method.as_slice)
 - Added classvar `NothingType._exists`
+- Added function `maybe_exc()`
 
 ### Changed
 
