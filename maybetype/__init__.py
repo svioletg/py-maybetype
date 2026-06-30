@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import re
 from collections.abc import Callable, Iterable
-from typing import Any, ClassVar, Never, Self, cast, override
+from typing import Any, ClassVar, Never, Self, cast, overload, override
 
 from maybetype.errors import MaybeInitError, NothingTypeInitError, ResultInitError, ResultUnwrapError
 
@@ -331,6 +331,10 @@ class Some[T](Maybe):
     def __bool__(self) -> bool:
         return True
 
+@overload
+def maybe[T](val: None, predicate: Callable[[T], bool] = lambda v: v is not None) -> NothingType: ...
+@overload
+def maybe[T](val: T, predicate: Callable[[T], bool] = lambda v: v is not None) -> Maybe[T]: ...
 def maybe[T](val: T | None, predicate: Callable[[T], bool] = lambda v: v is not None) -> Maybe[T]:
     """Returns ``Nothing`` if ``val`` is ``None`` or ``not predicate(val)``, otherwise returns ``Some(val)``.
 

@@ -19,6 +19,7 @@ Documentation here: <https://py-maybetype.readthedocs.io/en/latest/reference/>
   - Replicates Rust's [`Option::as_slice`](https://doc.rust-lang.org/std/option/enum.Option.html#method.as_slice)
 - Added classvar `NothingType._exists`
 - Added function `maybe_exc()`
+- Added overloads for `maybe()` to indicate that `maybe(None)` returns `NothingType`
 
 ### Changed
 
