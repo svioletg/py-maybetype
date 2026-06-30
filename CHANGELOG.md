@@ -42,6 +42,8 @@ Documentation here: <https://py-maybetype.readthedocs.io/en/latest/reference/>
 - Shortened description for parameter `err` in `Maybe.get()` docstring
 - Parameter `accessor` of `Maybe.get()` is now typed as `object` instead of `Any`
 - `Maybe.get()` no longer calls function `maybe()`, uses ternary to decide default return value
+- Parameter `default` of `Maybe.get()` now defaults to `...` and takes a type `U | EllipsisType`
+  instead of `U | None` since `None` is now a supported `Some` value
 
 ### Removed
 

@@ -141,6 +141,7 @@ def test_maybe_get(val: object, accessor: object, result: object, err: type[Exce
     m: Maybe = maybe(val)
 
     assert m.get(accessor) == result
+    assert m.get(accessor, default=...) == result
 
     if result is Nothing:
         assert m.get(accessor, default=0).unwrap() == 0

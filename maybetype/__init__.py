@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import re
 from collections.abc import Callable, Iterable
+from types import EllipsisType
 from typing import Any, ClassVar, Never, Self, cast, overload, override
 
 from maybetype.errors import MaybeInitError, NothingTypeInitError, ResultInitError, ResultUnwrapError
@@ -129,7 +130,7 @@ class Maybe[T]:
             _typ: type[U] | None = None,
             *,
             err: bool = False,
-            default: U | None = None,
+            default: U | EllipsisType = ...,
         ) -> Maybe[U]:
         """Attempts to access an item by ``accessor`` on the wrapped object if it supports ``__getitem__``.
 
@@ -142,7 +143,7 @@ class Maybe[T]:
             ``False`` (default), these errors are ignored and ``Nothing`` is returned.
         :param default: Specifies an alternate value to return a ``Some`` of instead of returning ``Nothing``.
         """
-        default_maybe: Maybe[U] = Nothing if default is None else Some(default)
+        default_maybe: Maybe[U] = Nothing if default is ... else Some(default)
 
         if hasattr(self._val, '__getitem__'):
             try:
