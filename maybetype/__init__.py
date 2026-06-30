@@ -347,9 +347,9 @@ def maybe_exc[T](
     ) -> Maybe[T]:
     r"""Returns ``Nothing`` if ``fn()`` raises the specified error(s), otherwise returns ``Some`` with its result.
 
-    >>> assert maybe_exc(int('1'), ValueError) == Some(1)
-    >>> assert maybe_exc(int('one'), ValueError) == Nothing
-    >>> assert maybe_exc(int('one'), (ValueError, r'invalid literal for int\(\).*')) == Nothing
+    >>> assert maybe_exc(lambda: int('1'), ValueError) == Some(1)
+    >>> assert maybe_exc(lambda: int('one'), ValueError) == Nothing
+    >>> assert maybe_exc(lambda: int('one'), (ValueError, r'invalid literal for int\(\).*')) == Nothing
 
     :param fn: A function to call which takes no arguments.
     :param exc: One or more either exception types or a tuple of an exception type and regex pattern to match the raised
