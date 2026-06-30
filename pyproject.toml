@@ -1,6 +1,6 @@
 [project]
 name = "py-maybetype"
-description = "A basic implementation of a maybe/option type in Python, largely inspired by Rust's Option."
+description = "A basic implementation of a maybe/option type in Python, largely modeled after by Rust's Option and Result types."
 authors = [
     { name = "Seth 'Violet' Gibbs" }
 ]
