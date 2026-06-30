@@ -94,8 +94,8 @@ class Maybe[T]:
         except AttributeError:
             return Nothing
 
-    def cast[U](self, _typ: type[U]) -> Maybe[U]:
-        """Returns a reference to this instance after casting its type as ``Maybe[typ]``."""
+    def cast[U](self, typ: type[U]) -> Maybe[U]:  # noqa: ARG002
+        """Returns this instance casted to ``Maybe[typ]``."""
         return cast('Maybe[U]', self)
 
     def filter(self, predicate: Callable[[T], bool]) -> Maybe[T]:

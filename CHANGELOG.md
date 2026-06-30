@@ -37,6 +37,7 @@ Documentation here: <https://py-maybetype.readthedocs.io/en/latest/reference/>
   directly which is much faster, all usages of `self.unwrap()` had already checked for `Nothing`
 - The existence of a `NothingType` instance is now checked in `NothingType.__new__()` instead of
   `__init__()`, and a `bool` is used instead of an `int`
+- Docstring for `Maybe.cast()` made more succinct
 
 ### Removed
 
