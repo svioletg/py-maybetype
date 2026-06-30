@@ -117,18 +117,18 @@ def test_maybe_attr() -> None:
     assert m_none.attr('x') is Nothing
     assert m_none.attr('x', 2).unwrap() == 2  # noqa: PLR2004
 
-@pytest.mark.parametrize(('val', 'accessor', 'result'),
+@pytest.mark.parametrize(('val', 'accessor', 'result', 'err'),
     [
-        (None,             1,   Nothing),
-        ([1, 2, 3],        1,   Some(2)),
-        ([1, 2, 3],        3,   Nothing),
-        ([],               1,   Nothing),
-        ({'a': 1, 'b': 2}, 'a', Some(1)),
-        ({'a': 1, 'b': 2}, 'c', Nothing),
-        ({},               'a', Nothing),
+        (0,                1,   Nothing, None),
+        ([1, 2, 3],        1,   Some(2), None),
+        ([1, 2, 3],        3,   Nothing, IndexError),
+        ([],               1,   Nothing, IndexError),
+        ({'a': 1, 'b': 2}, 'a', Some(1), None),
+        ({'a': 1, 'b': 2}, 'c', Nothing, KeyError),
+        ({},               'a', Nothing, KeyError),
     ],
     ids=[
-        'none',
+        'no_getitem',
         'list_populated',
         'list_populated_out_of_range',
         'list_empty',
@@ -137,9 +137,17 @@ def test_maybe_attr() -> None:
         'dict_empty',
     ],
 )
-def test_maybe_get(val: object, accessor: object, result: object) -> None:
+def test_maybe_get(val: object, accessor: object, result: object, err: type[Exception] | None) -> None:
     m: Maybe = maybe(val)
+
     assert m.get(accessor) == result
+
+    if result is Nothing:
+        assert m.get(accessor, default=0).unwrap() == 0
+
+    if err:
+        with pytest.raises(err):
+            m.get(accessor, err=True)
 
 def test_maybe_cat() -> None:
     assert Maybe.cat((Some(1), Some('one'), Nothing, Some(2))) == [1, 'one', 2]

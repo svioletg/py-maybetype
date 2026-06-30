@@ -39,6 +39,9 @@ Documentation here: <https://py-maybetype.readthedocs.io/en/latest/reference/>
 - The existence of a `NothingType` instance is now checked in `NothingType.__new__()` instead of
   `__init__()`, and a `bool` is used instead of an `int`
 - Docstring for `Maybe.cast()` made more succinct
+- Shortened description for parameter `err` in `Maybe.get()` docstring
+- Parameter `accessor` of `Maybe.get()` is now typed as `object` instead of `Any`
+- `Maybe.get()` no longer calls function `maybe()`, uses ternary to decide default return value
 
 ### Removed
 

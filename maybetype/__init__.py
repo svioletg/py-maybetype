@@ -125,7 +125,7 @@ class Maybe[T]:
         return maybe(cast('T', self._val._val))  # noqa: SLF001
 
     def get[U](self,
-            accessor: Any,  # noqa: ANN401
+            accessor: object,
             _typ: type[U] | None = None,
             *,
             err: bool = False,
@@ -138,19 +138,21 @@ class Maybe[T]:
 
         :param typ: Specifies the generic type of the resulting ``Maybe``. No conversion is performed; this argument is
             only for typing purposes.
-        :param err: By default, ``IndexError`` and ``KeyError`` are not raised when ``__getitem__`` is called on the
-            wrapped value, and ``Nothing`` is returned instead. Setting ``err`` to ``True`` allows these errors to be
-            raised as they normally would. Note that if ``__getitem__`` did not exist on the wrapped value in the first
-            placed (such as with ``Nothing``), no error is raised, and ``Nothing`` is returned regardless.
+        :param err: Whether to allow ``IndexError`` and ``KeyError`` to propagate from the ``__getitem__`` call. When
+            ``False`` (default), these errors are ignored and ``Nothing`` is returned.
         :param default: Specifies an alternate value to return a ``Some`` of instead of returning ``Nothing``.
         """
+        default_maybe: Maybe[U] = Nothing if default is None else Some(default)
+
         if hasattr(self._val, '__getitem__'):
             try:
                 return Some(self._val.__getitem__(accessor))  # ty:ignore[call-non-callable]
             except (IndexError, KeyError):
                 if err:
                     raise
-        return maybe(default)
+                return default_maybe
+
+        return default_maybe
 
     def inspect(self, func: Callable[[T], Any]) -> Self:
         """Calls a function with the wrapped value if ``Some``, otherwise does nothing. Returns this instance."""
