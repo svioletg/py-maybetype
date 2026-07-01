@@ -383,7 +383,7 @@ def maybe_exc[T](
 
 # Result type
 
-class Result[T, E]:  # noqa: PLW1641 ; Intentional, we want Ok and Err comparable but not hashable
+class Result[T, E]:
     """A class which wraps a value of ``T`` if the instance is of the subclass ``Ok``, or wraps ``E`` if ``Err``.
 
     The ``Result`` class itself should only be using for type annotations and not instancing; use the ``Ok`` and ``Err``
@@ -411,6 +411,10 @@ class Result[T, E]:  # noqa: PLW1641 ; Intentional, we want Ok and Err comparabl
         if not isinstance(other, self.__class__):
             return False
         return self._val == other._val
+
+    def __hash__(self) -> int:
+        """Returns the hash of the class plus the hash of the wrapped value."""
+        return hash(self.__class__) + hash(self._val)
 
     def and_then[U](self, func: Callable[[T], Result[U, E]]) -> Result[U, E]:
         """Returns ``func`` called with the wrapped value if ``Ok``, otherwise returns this instance."""

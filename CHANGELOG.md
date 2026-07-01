@@ -13,6 +13,8 @@ Documentation here: <https://py-maybetype.readthedocs.io/en/latest/reference/>
 
 ### Added
 
+- `Result` is now hashable
+
 ### Changed
 
 ### Deprecated

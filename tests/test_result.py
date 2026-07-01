@@ -121,3 +121,8 @@ def test_unwrap() -> None:
 
     assert ok.unwrap_or_else(len) == 1
     assert err.unwrap_or_else(len) == 7  # noqa: PLR2004
+
+def test_hash() -> None:
+    assert hash(Ok(1)) == hash(Ok(1))
+    assert hash(Err(1)) == hash(Err(1))
+    assert hash(Ok(1)) != hash(Err(1))
