@@ -358,3 +358,8 @@ def test_maybe_exc() -> None:
         maybe_exc(lambda: fn('1'), (ValueError, 'cannot be negative'))
     with pytest.raises(ValueError, match='cannot be negative'):
         maybe_exc(lambda: fn(-1), (TypeError, 'not an int'))
+
+def test_hash() -> None:
+    assert hash(Some(1))
+    assert hash(Nothing)
+    assert hash(Some(None)) != hash(Nothing)

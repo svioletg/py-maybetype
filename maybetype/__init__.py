@@ -332,6 +332,11 @@ class NothingType(Maybe):
     def __bool__(self) -> bool:
         return False
 
+    @override
+    def __hash__(self) -> int:
+        """Returns the hash of the ``NothingType`` class."""
+        return hash(NothingType)
+
 Nothing = NothingType()
 
 @overload

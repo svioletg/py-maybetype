@@ -21,6 +21,8 @@ Documentation here: <https://py-maybetype.readthedocs.io/en/latest/reference/>
 
 ### Fixed
 
+- `NothingType` now defines `__hash__()` so that `hash(Some(None))` does not equal `hash(Nothing)`
+
 ### Security
 
 ## [0.13.1] - 2026-07-08
