@@ -290,6 +290,16 @@ class Maybe[T]:
         """  # noqa: D205
         return Some((self._val, other._val)) if self and other else Nothing
 
+class Some[T](Maybe):
+    """Subclass of ``Maybe`` representing a present value of type ``T``."""
+
+    def __init__(self, val: T) -> None:
+        self._val: T = val
+
+    @override
+    def __bool__(self) -> bool:
+        return True
+
 class NothingType(Maybe):
     """Subclass of ``Maybe`` representing no value."""
 
@@ -323,16 +333,6 @@ class NothingType(Maybe):
         return False
 
 Nothing = NothingType()
-
-class Some[T](Maybe):
-    """Subclass of ``Maybe`` representing a present value of type ``T``."""
-
-    def __init__(self, val: T) -> None:
-        self._val: T = val
-
-    @override
-    def __bool__(self) -> bool:
-        return True
 
 @overload
 def maybe[T](val: None, predicate: Callable[[T], bool] = lambda v: v is not None) -> NothingType: ...
