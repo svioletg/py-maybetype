@@ -9,7 +9,7 @@ Generally, more significant breaking changes will be put near the top of each ca
 
 Documentation here: <https://py-maybetype.readthedocs.io/en/latest/reference/>
 
-## [Unreleased]
+## [0.13.1] - 2026-07-08
 
 ### Fixed
 
