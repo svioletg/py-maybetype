@@ -1,4 +1,4 @@
-from typing import Never
+from typing import Never, cast
 
 import pytest
 
@@ -24,6 +24,23 @@ def test_equality() -> None:
     assert Ok([]) == Ok([])
     assert Ok([1, 2]) == Ok([1, 2])
     assert Ok([1, 2]) != Ok([1, 2, 3])
+
+def test_pattern_matching() -> None:
+    match cast('Result[int, str]', Ok(1)):
+        case Ok(t):
+            assert t == 1
+        case Err(e):
+            raise ValueError(f'Matched Err: {e}')
+        case _:
+            raise ValueError('Matched neither branch')
+
+    match cast('Result[int, str]', Err('one')):
+        case Ok(t):
+            raise ValueError(f'Matched Ok: {t}')
+        case Err(e):
+            assert e == 'one'
+        case _:
+            raise ValueError('Matched neither branch')
 
 # Result methods
 
