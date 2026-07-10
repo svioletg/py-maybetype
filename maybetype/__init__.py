@@ -8,7 +8,7 @@ from typing import Any, ClassVar, Never, Self, cast, overload, override
 
 from maybetype.errors import MaybeInitError, NothingTypeInitError, ResultInitError, ResultUnwrapError
 
-__version__ = '0.13.1'
+__version__ = '0.14.0'
 
 class Maybe[T]:
     """Wraps a possible value of type ``T``.
