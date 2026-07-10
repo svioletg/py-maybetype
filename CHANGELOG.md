@@ -14,6 +14,7 @@ Documentation here: <https://py-maybetype.readthedocs.io/en/latest/reference/>
 ### Added
 
 - `Result` is now hashable
+- Added `_val` type declaration in class body of `Ok` and `Err` as `T` and `E` respectively
 
 ### Changed
 

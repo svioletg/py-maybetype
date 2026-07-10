@@ -558,6 +558,8 @@ class Result[T, E]:
 class Ok[T, E](Result[T, E]):
     """Indicates a successful result of type ``T``."""
 
+    _val: T
+
     def __init__(self, val: T) -> None:
         self._val: T = val
 
@@ -567,6 +569,8 @@ class Ok[T, E](Result[T, E]):
 
 class Err[T, E](Result[T, E]):
     """Indicates a failed result of type ``E``."""
+
+    _val: E
 
     def __init__(self, val: E) -> None:
         self._val: E = val
