@@ -129,7 +129,6 @@ class Maybe[T]:
             accessor: object,
             _typ: type[U] | None = None,
             *,
-            err: bool = False,
             default: U | EllipsisType = ...,
         ) -> Maybe[U]:
         """Attempts to access an item by ``accessor`` on the wrapped object if it supports ``__getitem__``.
@@ -139,8 +138,6 @@ class Maybe[T]:
 
         :param typ: Specifies the generic type of the resulting ``Maybe``. No conversion is performed; this argument is
             only for typing purposes.
-        :param err: Whether to allow ``IndexError`` and ``KeyError`` to propagate from the ``__getitem__`` call. When
-            ``False`` (default), these errors are ignored and ``Nothing`` is returned.
         :param default: Specifies an alternate value to return a ``Some`` of instead of returning ``Nothing``.
         """
         default_maybe: Maybe[U] = Nothing if default is ... else Some(default)
@@ -149,8 +146,6 @@ class Maybe[T]:
             try:
                 return Some(self._val.__getitem__(accessor))  # ty:ignore[call-non-callable]
             except (IndexError, KeyError):
-                if err:
-                    raise
                 return default_maybe
 
         return default_maybe
