@@ -136,9 +136,10 @@ class Maybe[T]:
         If it does not, or if the value does not exist (list index out of range, key does not exist on a dictionary,
         etc.), ``Nothing`` is returned.
 
-        :param typ: Specifies the generic type of the resulting ``Maybe``. No conversion is performed; this argument is
-            only for typing purposes.
-        :param default: Specifies an alternate value to return a ``Some`` of instead of returning ``Nothing``.
+        :param typ: Specifies the generic type of the resulting ``Maybe``. Only used for typing, unused in the function
+            body.
+        :param default: If not :data:`Ellipsis` and the index or key does not exist on the wrapped value, returns
+            ``Some(default)`` instead of ``Nothing``.
         """
         default_maybe: Maybe[U] = Nothing if default is ... else Some(default)
 
